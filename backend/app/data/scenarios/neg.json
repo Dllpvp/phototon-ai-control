@@ -1,0 +1,20 @@
+{
+  "scenario_id": "neg",
+  "as_of": "2026-11-16",
+  "week": 47,
+  "nodes": [
+    {"id": "hr_operators_s3", "value": 6, "status": "green"},
+    {"id": "prod_downtime_l2", "value": 2, "status": "green"},
+    {"id": "quality_defect_rate", "value": 11.0, "status": "red"},
+    {"id": "prod_reprint_volume", "value": 12, "status": "red"},
+    {"id": "sales_sla_breach", "value": 4, "status": "yellow"},
+    {"id": "fin_margin", "value": 27.5, "status": "red"},
+    {"id": "fin_loss_day", "value": 2170, "status": "red"},
+    {"id": "equip_lamination_wear", "value": 96, "status": "red"}
+  ],
+  "journal": {
+    "decision": "hire_2_operators_s3",
+    "verdict": "ineffective",
+    "recommendation": "ТО ламинатора"
+  }
+}

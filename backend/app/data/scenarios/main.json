@@ -1,0 +1,16 @@
+{
+  "scenario_id": "main",
+  "as_of": "2026-11-02",
+  "week": 45,
+  "nodes": [
+    {"id": "fin_margin", "value": 32.0, "status": "red"},
+    {"id": "fin_loss_day", "value": 1840, "status": "red"},
+    {"id": "fin_revenue_week", "value": 41200, "status": "yellow"},
+    {"id": "sales_sla_breach", "value": 23, "status": "red"},
+    {"id": "prod_downtime_l2", "value": 14, "status": "red"},
+    {"id": "quality_defect_rate", "value": 9.0, "status": "red"},
+    {"id": "hr_operators_s3", "value": 4, "status": "red"},
+    {"id": "hr_overtime_s3", "value": 9, "status": "red"},
+    {"id": "prod_reprint_volume", "value": 9, "status": "red"}
+  ]
+}

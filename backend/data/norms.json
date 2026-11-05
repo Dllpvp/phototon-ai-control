@@ -1,0 +1,10 @@
+[
+  {"metric": "fin_margin", "domain": "finance", "min": 35, "max": 40, "unit": "%", "warn": 33},
+  {"metric": "prod_downtime_l2", "domain": "production", "min": 0, "max": 4, "unit": "ч/сут"},
+  {"metric": "quality_defect_rate", "domain": "quality", "min": 2, "max": 5, "unit": "%"},
+  {"metric": "sales_sla_breach", "domain": "clients", "min": 0, "max": 5, "unit": "заказ/сут"},
+  {"metric": "hr_operators_s3", "domain": "hr", "min": 6, "max": 7, "unit": "чел"},
+  {"metric": "hr_overtime_s3", "domain": "hr", "min": 0, "max": 6, "unit": "ч/сут"},
+  {"metric": "prod_reprint_volume", "domain": "production", "min": 0, "max": 3, "unit": "тираж/сут"},
+  {"metric": "sales_churn_risk_b2b7", "domain": "clients", "min": 0, "max": 20, "unit": "% (риск)"}
+]

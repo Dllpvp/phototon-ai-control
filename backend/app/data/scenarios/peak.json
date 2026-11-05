@@ -1,0 +1,23 @@
+{
+  "scenario_id": "peak",
+  "as_of": "2026-11-16",
+  "week": 47,
+  "nodes": [
+    {"id": "season_peak_risk", "value": 82, "status": "red"},
+    {"id": "season_week_coeff", "value": 1.35, "status": "yellow"},
+    {"id": "prod_downtime_l2", "value": 9, "status": "red"},
+    {"id": "fin_loss_day", "value": 1180, "status": "red"}
+  ],
+  "forecast": {
+    "forecast_orders": 1240,
+    "capacity_orders": 1050,
+    "deficit": 190
+  },
+  "recommended": {
+    "action": "превентивно нанять 2 оператора (смена 3)",
+    "downtime_h_before": 9,
+    "downtime_h_after": 3,
+    "loss_day_before": 1180,
+    "loss_day_after": 393
+  }
+}

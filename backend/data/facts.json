@@ -1,0 +1,386 @@
+{
+  "period": {
+    "from": "2026-01-05",
+    "to": "2026-11-08",
+    "granularity": "day"
+  },
+  "facts": [
+    {
+      "ts": "2026-11-02",
+      "domain": "production",
+      "metric": "downtime_line2_h",
+      "value": 14.0,
+      "dims": {
+        "line": "L2",
+        "shift": 3
+      }
+    },
+    {
+      "ts": "2026-11-02",
+      "domain": "quality",
+      "metric": "defect_rate",
+      "value": 9.0,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-02",
+      "domain": "finance",
+      "metric": "margin",
+      "value": 32.0,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-02",
+      "domain": "clients",
+      "metric": "orders_received",
+      "value": 168,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-02",
+      "domain": "clients",
+      "metric": "orders_delivered",
+      "value": 161,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-02",
+      "domain": "finance",
+      "metric": "revenue",
+      "value": 8680,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-03",
+      "domain": "production",
+      "metric": "downtime_line2_h",
+      "value": 13.4,
+      "dims": {
+        "line": "L2",
+        "shift": 3
+      }
+    },
+    {
+      "ts": "2026-11-03",
+      "domain": "quality",
+      "metric": "defect_rate",
+      "value": 5.13,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-03",
+      "domain": "finance",
+      "metric": "margin",
+      "value": 24.94,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-03",
+      "domain": "clients",
+      "metric": "orders_received",
+      "value": 161,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-03",
+      "domain": "clients",
+      "metric": "orders_delivered",
+      "value": 165,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-03",
+      "domain": "finance",
+      "metric": "revenue",
+      "value": 8803,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-04",
+      "domain": "production",
+      "metric": "downtime_line2_h",
+      "value": 14.2,
+      "dims": {
+        "line": "L2",
+        "shift": 3
+      }
+    },
+    {
+      "ts": "2026-11-04",
+      "domain": "quality",
+      "metric": "defect_rate",
+      "value": 5.2,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-04",
+      "domain": "finance",
+      "metric": "margin",
+      "value": 25.18,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-04",
+      "domain": "clients",
+      "metric": "orders_received",
+      "value": 155,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-04",
+      "domain": "clients",
+      "metric": "orders_delivered",
+      "value": 156,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-04",
+      "domain": "finance",
+      "metric": "revenue",
+      "value": 8684,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-05",
+      "domain": "production",
+      "metric": "downtime_line2_h",
+      "value": 11.6,
+      "dims": {
+        "line": "L2",
+        "shift": 3
+      }
+    },
+    {
+      "ts": "2026-11-05",
+      "domain": "quality",
+      "metric": "defect_rate",
+      "value": 5.34,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-05",
+      "domain": "finance",
+      "metric": "margin",
+      "value": 25.54,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-05",
+      "domain": "clients",
+      "metric": "orders_received",
+      "value": 169,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-05",
+      "domain": "clients",
+      "metric": "orders_delivered",
+      "value": 156,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-05",
+      "domain": "finance",
+      "metric": "revenue",
+      "value": 8742,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-06",
+      "domain": "production",
+      "metric": "downtime_line2_h",
+      "value": 13.9,
+      "dims": {
+        "line": "L2",
+        "shift": 3
+      }
+    },
+    {
+      "ts": "2026-11-06",
+      "domain": "quality",
+      "metric": "defect_rate",
+      "value": 5.11,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-06",
+      "domain": "finance",
+      "metric": "margin",
+      "value": 25.79,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-06",
+      "domain": "clients",
+      "metric": "orders_received",
+      "value": 173,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-06",
+      "domain": "clients",
+      "metric": "orders_delivered",
+      "value": 158,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-06",
+      "domain": "finance",
+      "metric": "revenue",
+      "value": 8441,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-07",
+      "domain": "production",
+      "metric": "downtime_line2_h",
+      "value": 14.4,
+      "dims": {
+        "line": "L2",
+        "shift": 3
+      }
+    },
+    {
+      "ts": "2026-11-07",
+      "domain": "quality",
+      "metric": "defect_rate",
+      "value": 5.5,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-07",
+      "domain": "finance",
+      "metric": "margin",
+      "value": 24.65,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-07",
+      "domain": "clients",
+      "metric": "orders_received",
+      "value": 157,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-07",
+      "domain": "clients",
+      "metric": "orders_delivered",
+      "value": 167,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-07",
+      "domain": "finance",
+      "metric": "revenue",
+      "value": 8752,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-08",
+      "domain": "production",
+      "metric": "downtime_line2_h",
+      "value": 13.9,
+      "dims": {
+        "line": "L2",
+        "shift": 3
+      }
+    },
+    {
+      "ts": "2026-11-08",
+      "domain": "quality",
+      "metric": "defect_rate",
+      "value": 5.98,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-08",
+      "domain": "finance",
+      "metric": "margin",
+      "value": 25.36,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-08",
+      "domain": "clients",
+      "metric": "orders_received",
+      "value": 181,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-08",
+      "domain": "clients",
+      "metric": "orders_delivered",
+      "value": 159,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-08",
+      "domain": "finance",
+      "metric": "revenue",
+      "value": 8716,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-02",
+      "domain": "hr",
+      "metric": "operators_on_shift",
+      "value": 4,
+      "dims": {
+        "shift": 3
+      }
+    },
+    {
+      "ts": "2026-11-02",
+      "domain": "clients",
+      "metric": "sla_breach",
+      "value": 23,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-02",
+      "domain": "production",
+      "metric": "reprint_volume",
+      "value": 9,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-02",
+      "domain": "finance",
+      "metric": "revenue_week",
+      "value": 41200,
+      "dims": {}
+    },
+    {
+      "ts": "2026-11-02",
+      "domain": "production",
+      "metric": "downtime_line2_h",
+      "value": 14.0,
+      "dims": {
+        "line": "L2",
+        "shift": 3,
+        "note": "anchor"
+      }
+    },
+    {
+      "ts": "2026-10-26",
+      "domain": "clients",
+      "metric": "orders_received",
+      "value": 156,
+      "dims": {}
+    },
+    {
+      "ts": "2026-10-26",
+      "domain": "clients",
+      "metric": "orders_delivered",
+      "value": 150,
+      "dims": {}
+    },
+    {
+      "ts": "2026-10-26",
+      "domain": "finance",
+      "metric": "revenue",
+      "value": 8060,
+      "dims": {}
+    }
+  ]
+}

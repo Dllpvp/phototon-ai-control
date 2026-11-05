@@ -1,0 +1,353 @@
+{
+  "nodes": [
+    {
+      "id": "fin_margin",
+      "domain": "finance",
+      "name": "Маржинальность",
+      "unit": "%",
+      "value_main": 32.0,
+      "norm": [35.0, 40.0],
+      "status_main": "red",
+      "cost_per_day": 1840.0
+    },
+    {
+      "id": "fin_loss_day",
+      "domain": "finance",
+      "name": "Потери в сутки",
+      "unit": "BYN/сут",
+      "value_main": 1840.0,
+      "norm": [0.0, 300.0],
+      "status_main": "red",
+      "cost_per_day": null
+    },
+    {
+      "id": "fin_revenue_week",
+      "domain": "finance",
+      "name": "Выручка за неделю",
+      "unit": "BYN/нед",
+      "value_main": 41200.0,
+      "norm": [45000.0, null],
+      "status_main": "yellow",
+      "cost_per_day": null
+    },
+    {
+      "id": "sales_sla_breach",
+      "domain": "clients",
+      "name": "Срывы сроков",
+      "unit": "зак/сут",
+      "value_main": 23.0,
+      "norm": [0.0, 5.0],
+      "status_main": "red",
+      "cost_per_day": null
+    },
+    {
+      "id": "sales_b2b_orders",
+      "domain": "clients",
+      "name": "B2B-заказы",
+      "unit": "зак/сут",
+      "value_main": 48.0,
+      "norm": [55.0, null],
+      "status_main": "yellow",
+      "cost_per_day": null
+    },
+    {
+      "id": "sales_b2c_churn_risk",
+      "domain": "clients",
+      "name": "Риск оттока B2C",
+      "unit": "%",
+      "value_main": 12.0,
+      "norm": [0.0, 10.0],
+      "status_main": "yellow",
+      "cost_per_day": null
+    },
+    {
+      "id": "sales_client7_margin",
+      "domain": "clients",
+      "name": "Маржа клиента №7",
+      "unit": "%",
+      "value_main": -4.0,
+      "norm": [15.0, 30.0],
+      "status_main": "red",
+      "cost_per_day": null
+    },
+    {
+      "id": "prod_downtime_l2",
+      "domain": "production",
+      "name": "Простой линии №2",
+      "unit": "ч/сут",
+      "value_main": 14.0,
+      "norm": [0.0, 4.0],
+      "status_main": "red",
+      "cost_per_day": null
+    },
+    {
+      "id": "prod_print_queue",
+      "domain": "production",
+      "name": "Очередь печати",
+      "unit": "заказов",
+      "value_main": 300.0,
+      "norm": [0.0, 150.0],
+      "status_main": "red",
+      "cost_per_day": null
+    },
+    {
+      "id": "prod_reprint_volume",
+      "domain": "production",
+      "name": "Повторные тиражи",
+      "unit": "тираж/сут",
+      "value_main": 9.0,
+      "norm": [0.0, 3.0],
+      "status_main": "red",
+      "cost_per_day": null
+    },
+    {
+      "id": "quality_defect_rate",
+      "domain": "quality",
+      "name": "Брак",
+      "unit": "%",
+      "value_main": 9.0,
+      "norm": [2.0, 5.0],
+      "status_main": "red",
+      "cost_per_day": null
+    },
+    {
+      "id": "hr_operators_s3",
+      "domain": "hr",
+      "name": "Брошюровщики смены №3",
+      "unit": "чел",
+      "value_main": 4.0,
+      "norm": [6.0, 7.0],
+      "status_main": "red",
+      "cost_per_day": null
+    },
+    {
+      "id": "hr_overtime_s3",
+      "domain": "hr",
+      "name": "Переработки смены №3",
+      "unit": "ч/сут",
+      "value_main": 9.0,
+      "norm": [0.0, 6.0],
+      "status_main": "red",
+      "cost_per_day": null
+    },
+    {
+      "id": "hr_turnover",
+      "domain": "hr",
+      "name": "Текучесть кадров",
+      "unit": "%/год",
+      "value_main": 28.0,
+      "norm": [null, 15.0],
+      "status_main": "red",
+      "cost_per_day": null
+    },
+    {
+      "id": "equip_lamination_wear",
+      "domain": "quality",
+      "name": "Износ узла ламинации",
+      "unit": "%",
+      "value_main": 91.0,
+      "norm": [0.0, 70.0],
+      "status_main": "red",
+      "cost_per_day": null
+    },
+    {
+      "id": "season_week_coeff",
+      "domain": "season",
+      "name": "Коэффициент недели",
+      "unit": "×",
+      "value_main": 1.4,
+      "norm": [0.8, 1.3],
+      "status_main": "yellow",
+      "cost_per_day": null
+    },
+    {
+      "id": "season_peak_risk",
+      "domain": "season",
+      "name": "Риск пика",
+      "unit": "%",
+      "value_main": 65.0,
+      "norm": [0.0, 50.0],
+      "status_main": "yellow",
+      "cost_per_day": null
+    },
+    {
+      "id": "fin_ondemand_margin",
+      "domain": "finance",
+      "name": "Маржа онлайн-заказов",
+      "unit": "%",
+      "value_main": 38.0,
+      "norm": [35.0, 45.0],
+      "status_main": "green",
+      "cost_per_day": null
+    }
+  ],
+  "edges": [
+    {
+      "from": "hr_operators_s3",
+      "to": "hr_overtime_s3",
+      "sign": -1,
+      "weight": 2.5,
+      "lag_days": 1,
+      "note": "−1 чел → +2.5 ч переработки",
+      "curvature": 0.0
+    },
+    {
+      "from": "hr_operators_s3",
+      "to": "prod_downtime_l2",
+      "sign": -1,
+      "weight": 3.0,
+      "lag_days": 0,
+      "note": "−1 чел → +простой (см. §7.3)",
+      "curvature": 0.75
+    },
+    {
+      "from": "hr_overtime_s3",
+      "to": "quality_defect_rate",
+      "sign": 1,
+      "weight": 0.8,
+      "lag_days": 1,
+      "note": "переработка → усталость → брак",
+      "curvature": 0.0
+    },
+    {
+      "from": "hr_turnover",
+      "to": "hr_operators_s3",
+      "sign": -1,
+      "weight": 0.4,
+      "lag_days": 30,
+      "note": "текучесть → нехватка",
+      "curvature": 0.0
+    },
+    {
+      "from": "prod_downtime_l2",
+      "to": "prod_reprint_volume",
+      "sign": 1,
+      "weight": 0.3,
+      "lag_days": 1,
+      "note": "простой → повторные",
+      "curvature": 0.0
+    },
+    {
+      "from": "quality_defect_rate",
+      "to": "prod_reprint_volume",
+      "sign": 1,
+      "weight": 0.6,
+      "lag_days": 0,
+      "note": "брак → повторные тиражи",
+      "curvature": 0.0
+    },
+    {
+      "from": "quality_defect_rate",
+      "to": "sales_sla_breach",
+      "sign": 1,
+      "weight": 0.9,
+      "lag_days": 0,
+      "note": "брак → срыв",
+      "curvature": 0.0
+    },
+    {
+      "from": "prod_downtime_l2",
+      "to": "sales_sla_breach",
+      "sign": 1,
+      "weight": 0.8,
+      "lag_days": 1,
+      "note": "простой → срыв",
+      "curvature": 0.0
+    },
+    {
+      "from": "prod_reprint_volume",
+      "to": "fin_loss_day",
+      "sign": 1,
+      "weight": 510.0,
+      "lag_days": 0,
+      "note": "тираж повторной печати ≈ 510 BYN (REPRINT_COST)",
+      "curvature": 0.0
+    },
+    {
+      "from": "prod_downtime_l2",
+      "to": "fin_loss_day",
+      "sign": 1,
+      "weight": 131.0,
+      "lag_days": 0,
+      "note": "1 ч простоя = 131 BYN (COST_PER_DOWNTIME_H)",
+      "curvature": 0.0
+    },
+    {
+      "from": "sales_sla_breach",
+      "to": "fin_margin",
+      "sign": -1,
+      "weight": 0.25,
+      "lag_days": 2,
+      "note": "1 срыв → −0.25 п.п. маржи",
+      "curvature": 0.0
+    },
+    {
+      "from": "sales_sla_breach",
+      "to": "sales_b2c_churn_risk",
+      "sign": 1,
+      "weight": 0.45,
+      "lag_days": 3,
+      "note": "1 срыв → +0.45% риска оттока",
+      "curvature": 0.0
+    },
+    {
+      "from": "sales_sla_breach",
+      "to": "sales_client7_margin",
+      "sign": -1,
+      "weight": 0.9,
+      "lag_days": 7,
+      "note": "у клиента №7 всё плохо",
+      "curvature": 0.0
+    },
+    {
+      "from": "season_week_coeff",
+      "to": "prod_print_queue",
+      "sign": 1,
+      "weight": 210.0,
+      "lag_days": 0,
+      "note": "coeff 1.4 → очередь 210",
+      "curvature": 0.0
+    },
+    {
+      "from": "prod_print_queue",
+      "to": "sales_sla_breach",
+      "sign": 1,
+      "weight": 0.05,
+      "lag_days": 1,
+      "note": "очередь → срыв",
+      "curvature": 0.0
+    },
+    {
+      "from": "equip_lamination_wear",
+      "to": "quality_defect_rate",
+      "sign": 1,
+      "weight": 0.12,
+      "lag_days": 2,
+      "note": "компенсатор; только в негативной ветке",
+      "curvature": 0.0
+    },
+    {
+      "from": "fin_revenue_week",
+      "to": "fin_margin",
+      "sign": 1,
+      "weight": 0.0004,
+      "lag_days": 0,
+      "note": "выручка − маржа (при повышении)",
+      "curvature": 0.0
+    }
+  ],
+  "root_causes": [
+    "hr_operators_s3",
+    "equip_lamination_wear",
+    "season_week_coeff",
+    "hr_turnover",
+    "sales_client7_margin"
+  ],
+  "path_hints": [
+    {
+      "id": "chain_main",
+      "path": ["fin_margin", "sales_sla_breach", "prod_downtime_l2", "hr_operators_s3"],
+      "label": "Основная цепочка"
+    }
+  ]
+}
