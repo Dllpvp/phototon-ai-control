@@ -1,7 +1,7 @@
-# AGENTS.md — Правила для AI-агентов (OpenCode / GLM / Claude)
+# AGENTS.md — Правила для AI-агентов (OpenCode / Klinch)
 
 Этот проект — хакатонное демо-приложение «Фотопринт·Контроль» (управленческий MVP для фабрики фотокниг). 
-Единственный источник правды по архитектуре и математике — файл `Readme.md` в корне проекта.
+Единственный источник правды по архитектуре и математике — файл `Readme.md` в корне проекта. Перед любой задачей сверяйся с ним (особенно §7 «математика», §8 «сценарии», §9 «API», §10 «UI»).
 
 ## 🛑 АБСОЛЮТНЫЕ ЗАПРЕТЫ (Читать в первую очередь)
 1. **НИКАКОГО ХАРДКОДА В REACT.** Все экономические числа (1840, 41200, 22120, 131 и т.д.) живут ТОЛЬКО в `backend/app/core/anchors.py` и `constants.py`. Фронтенд только отрисовывает то, что пришло по API. Если тебе нужно число на экране — сначала добавь его в ANCHORS, напиши тест, и только потом выводи через API.
@@ -9,15 +9,26 @@
 3. **НЕ ДОБАВЛЯЙ ЗАВИСИМОСТИ СЛЕПО.** Новые пакеты (Python или npm) добавляются только если они критичны для демо, и это должно быть обосновано.
 4. **РУССКИЙ ЯЗЫК В UI.** Весь интерфейс, тексты ошибок, названия метрик — на русском языке. Код (переменные, функции) — на английском. Валюта — BYN. Даты — в формате `ru-RU`.
 5. **НИКАКИХ TODO В КОДЕ.** Если что-то не доделано — создай задачу, но не оставляй `TODO` в файлах без ссылки на неё.
-
+6.  **Не выполняй более 8-10 вызовов инструментов подряд без ответа пользователю.** После каждого важного действия (создание/правка файла) давай краткий статус выполнения. Это нужно для работы в OpenCode.
 ## 🏗 Архитектура и поток данных
 Строгая однонаправленная архитектура. Не перепрыгивай слои:
-`data/*.json` ➔ `backend/app/core/` (чистая математика, без FastAPI) ➔ `backend/app/api/` (тонкие роутеры, DTO in/out) ➔ `frontend/` (только отрисовка).
+`backend/data/*.json` + `backend/app/data/scenarios/*.json` ➔ `backend/app/core/` (чистая математика, без FastAPI) ➔ `backend/app/dependencies.py` и `backend/app/api/` (тонкие роутеры, DTO in/out) ➔ `frontend/` (только отрисовка).
 
-- **Backend:** Python 3.12 (зафиксировано из-за багов с 3.14), FastAPI, Pydantic v2, uvicorn. Данные хранятся в JSON + SQLite (для журнала).
-- **Frontend:** React 19, TypeScript, Vite, Tailwind CSS v4, Recharts, Zustand, TanStack Query.
-- **Интеграции:** Telegram (httpx, только исходящие сообщения), Gemini (httpx, temperature=0, строгий JSON, с кэшем и фолбэком), PDF (reportlab).
+Каталог данных можно переопределить переменной окружения `FOTOPRINT_DATA_DIR` (см. `backend/app/core/loader.py`).
 
+- **Backend:** Python 3.12+ (пин в `backend/pyproject.toml`, обоснование — `docs/adr/0001-python-version.md`), FastAPI, Pydantic v2 (+ pydantic-settings), uvicorn. Точные версии зависимостей — только в `backend/pyproject.toml` / `uv.lock`; не дублируй их здесь.
+- **Frontend:** React 19, TypeScript, Vite, Tailwind CSS v4, Recharts, Zustand, TanStack Query, framer-motion, lottie-web. Точные версии — только в `frontend/package.json`.
+- **Интеграции (ПЛАН, ещё не реализованы):** Telegram (httpx, только исходящие), Gemini (httpx, temperature=0, строгий JSON, кэш + фолбэк), PDF (reportlab). Каталоги `app/integrations/`, `app/report/` пока пустые; SQLite-журнал (`app/db.py`) тоже ещё не написан.
+
+## 📌 Текущее состояние (проверено в репозитории)
+- **Ядро** (`backend/app/core/`) реализовано: `graph`, `loader` (JSON ➔ Pydantic, кэш `lru_cache`), `anchors`, `constants`, `interpolation`, `economics`, `impact`, `forecast`, `simulate`. `uv run pytest -q` ➔ всё зелёное (49 тестов).
+- **API:** пока единственный маршрут `GET /api/health` (`app/main.py`). Роутеры в `app/api/` ещё не написаны.
+- **Пустые файлы-заглушки (0 байт), их предстоит наполнить:** `app/schemas.py`, `app/config.py`, `app/db.py`, `app/serve.py`, `app/api/__init__.py`, `tests/conftest.py`, `docs/adr/0001-python-version.md`, `pitch/*.md`, `tasks.ps1`, `.env.example`.
+- **Frontend:** стандартный Vite-стартер (`src/App.tsx` — демо-шаблон Vite), UI приложения ещё не начат.
+- **Данные:** `backend/data/{graph,norms,seasonality,facts}.json` и `backend/app/data/scenarios/{main,neg,peak}.json` **отслеживаются git'ом**. Файлы в `backend/data/` пересоздаются командой seed (см. ниже) — не правь их руками.
+- `jakub-skills/` — посторонний клон в `.gitignore`, к проекту не относится.
+
+Очередь задач — PLAN.md: бери первую задачу с [x→] т.е. первую незакрытую [ ], выполняй цикл из §0 PLAN.md.
 ## 📝 Дисциплина задачи (Как агенту получать задания)
 Каждая задача должна выполняться в формате:
 - **ЦЕЛЬ:** (что делаем)
@@ -39,21 +50,27 @@
 4. **Better-Layout:** Интерфейс должен выглядеть идеально на широком экране проектора. Используй семантические отступы Tailwind, избегай магических чисел в `style={{}}`.
 
 ## 🧪 Тестирование и Проверка
-- **Backend:** `pytest` в папке `backend/`. Ключевые тесты: `test_anchors.py` (цифры бьются), `test_graph.py` (граф ацикличен), `test_simulate.py` (эффект решений).
-- **Frontend:** `npm run build` (TypeScript strict mode). Ошибок компиляции быть не должно.
-- **Проверка хардкода:** Перед коммитом фронтенда мысленно (или через grep) проверь, нет ли в `src/` чисел `1840`, `41200`, `22120`. Их там быть не должно.
+- **Backend:** `uv run pytest -q` **из папки `backend/`** (иначе не подхватится `pyproject.toml`; настройки: `pythonpath=["."]`, `testpaths=["tests"]`). Тесты в `backend/tests/`: `test_anchors.py` (цифры бьются), `test_graph.py` (граф ацикличен), `test_impact.py` (BFS `delta`), `test_interpolation.py`, `test_forecast.py`, `test_simulate.py` (эффект решений: main=effective/22120, neg=ineffective). После правок в `core/` прогонять их обязательно.
+- **Frontend:** линтер — **oxlint** (`npm run lint`), НЕ eslint. Типы проверяет сборка: `npm run build` (`tsc -b && vite build`) — ошибок быть не должно. `tsconfig.json` — только project references (`tsconfig.app.json` + `tsconfig.node.json`).
+- **Проверка хардкода:** перед коммитом фронтенда grep'ом проверь, нет ли в `src/` чисел `1840`, `41200`, `22120`. Их там быть не должно.
 
 ## 🚀 Команды для запуска и проверки (Windows PowerShell)
-- Установка зависимостей бэкенда: `cd backend; uv sync`
-- Генерация данных: `cd backend; uv run python -m app.data.seed --out data`
-- Запуск тестов бэкенда: `cd backend; uv run pytest -q`
-- Запуск бэкенда: `cd backend; uv run uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload`
-- Установка зависимостей фронта: `cd frontend; npm install`
-- Сборка фронта (проверка TS): `cd frontend; npm run build`
-- Запуск фронта: `cd frontend; npm run dev`
+Из корня проекта (каждая команда — из своей папки, поэтому `;`-переход):
+
+- **Backend** (папка `backend/`):
+  - Установка зависимостей: `cd backend; uv sync`
+  - Генерация данных: `cd backend; uv run python -m app.data.seed --out data`
+  - Тесты: `cd backend; uv run pytest -q`
+  - Запуск сервера: `cd backend; uv run uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload`
+- **Frontend** (папка `frontend/`):
+  - Установка зависимостей: `cd frontend; npm install`
+  - Линт: `cd frontend; npm run lint`
+  - Сборка (проверка типов): `cd frontend; npm run build`
+  - Dev-сервер: `cd frontend; npm run dev`
 
 ## 🤖 Работа с контекстом
 - Один файл = одна тема. Максимум 300 строк на файл. Если файл разрастается — разбивай его.
-- Все Pydantic DTO находятся в одном месте: `backend/app/schemas.py`.
-- Все TypeScript типы (зеркала DTO) находятся в `frontend/src/api/types.ts`.
+- Все Pydantic DTO должны находиться в одном месте: `backend/app/schemas.py` (пока пуст — заполнять здесь, не разбрасывать DTO по роутерам).
+- Все TypeScript-типы (зеркала DTO) должны находиться в `frontend/src/api/types.ts` (ещё не создан).
 - Никогда не используй `any` в TypeScript.
+- Язык ответов и текстов коммитов — русский; имена в коде — английские.

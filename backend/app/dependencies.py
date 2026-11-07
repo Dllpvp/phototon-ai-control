@@ -35,6 +35,7 @@ from app.core.loader import (
     load_scenario,
     load_seasonality,
 )
+from app.db import DecisionStore
 
 
 class AppState(BaseModel):
@@ -63,6 +64,11 @@ def get_graph() -> GraphPayload:
 def get_scenario(scenario_id: str) -> Scenario:
     """Фикстура сценария `main`/`neg`/`peak` (§8) как FastAPI-зависимость."""
     return load_scenario(scenario_id)
+
+
+def get_db() -> DecisionStore:
+    """Хранилище решений (§4.3) как FastAPI-зависимость."""
+    return DecisionStore()
 
 
 def clear_state() -> None:
