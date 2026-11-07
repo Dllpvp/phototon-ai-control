@@ -26,7 +26,7 @@
 8. [Сценарии и их числа](#8)
 9. [Контракты API + DTO](#9)
 10. [Экраны и UI-спека](#10)
-11. [Интеграции: Telegram, Jira-мок, Gemini, PDF](#11)
+11. [Интеграции: Telegram, Jira-мок, DeepSeek (klinch cloud), PDF](#11)
 12. [Матрица «ТЗ → реализация»](#12)
 13. [Vibe coding: правила для работы с агентами](#13)
 14. [Порядок работ по шагам](#14)
@@ -190,7 +190,7 @@ uv — НЕ установлен (ставим через winget, §3.4); не �
 | Серверное состояние | **TanStack Query** | Кэш, инвалидация, ручные refetch на кнопках («+14 дней») |
 | Клиентское состояние | **zustand** | Фильтры, ас_оф, выбранный сценарий |
 | PDF | **reportlab** | Чистый Python, DejaVu, без GTK (WeasyPrint на Windows — забота) |
-| AI | **Gemini REST** через `httpx` | Никаких SDK; `temperature=0`, JSON-схема |
+| AI | **DeepSeek flash** через klinch cloud (**OpenAI SDK**) | OpenAI-совместимый транспорт; `temperature=0`, JSON-схема; доступен из РФ |
 | Telegram | `httpx` + `sendMessage` | 50 строк, ровно как в плане |
 | Тесты | **pytest + httpx AsyncClient** | Инварианты чисел, «золотые» ответы API |
 | Локальный HTTPS для телефона | не нужен (по IP, http) | Telegram-ссылка по сценарию является текстом, не обязательна для показа |
@@ -290,8 +290,9 @@ uvicorn.run(app, host="0.0.0.0", port=8000)
 ### 3.8. `.env.example`
 
 ```dotenv
-GEMINI_API_KEY=
-GEMINI_MODEL=gemini-2.5-flash
+KLINCH_API_KEY=
+DEEPSEEK_MODEL=deepseek-flash
+DEEPSEEK_BASE_URL=https://api.klinch.cloud/v1
 AI_ENABLED=true
 TELEGRAM_BOT_TOKEN=
 TELEGRAM_CHAT_ID=
@@ -380,7 +381,7 @@ C:\Proj\
 │  │  │  ├─ __init__.py
 │  │  │  ├─ telegram.py
 │  │  │  ├─ jira.py              # мок, счётчик в SQLite
-│  │  │  └─ gemini.py            # + cache + validator
+│  │  │  └─ ai_provider.py     # DeepSeek + cache + validator
 │  │  ├─ report/
 │  │  │  ├─ __init__.py
 │  │  │  ├─ context.py           # сбор контекста для PDF
@@ -991,40 +992,45 @@ class WhatIfDTO(BaseModel):
 - Нет `graph.json` → `500` с подсказкой, но `health` живёт.
 - Нет `.env` → всё работает (cache/fallback), `AI_ENABLED=true` не падает.
 - Telegram пустой → `status: "skipped_no_token"`, `notification` есть в ответе с `status`.
-- Gemini недоступен/брак → `source: "fallback"`; **демо никогда не блокируется**.
+- DeepSeek недоступен/брак → `source: "fallback"`; **демо никогда не блокируется**.
 
 ---
 
 <a id="10"></a>
 ## 10. Экраны и UI-спека
 
-### 10.1. Общий layout
+### 10.1.1. Тема `mission` — «CMYK Mission Control» (индустриальный пульт)
+Персона: начальник цеха/оператор. Тёмная по умолчанию. Сетка hairline 1px вплотную (gap=0),
+crop marks по углам ключевых секций, дот-поле под графом. Узлы графа = клеммы-прямоугольники
+[DOM_METRIC: value], активная цепочка — импульс stroke-dashoffset (.edge-live). LossCounter =
+механический одометр (translateY разрядов) + .live-dot + .osc. WhatIfSlider = фейдер с
+магнитными точками 4/5/6. Палитра/шрифты — токены [data-theme=mission] в theme.css.
+Запрещены: rounded>2px, мягкие blur-тени, градиенты фона.
 
-```
-┌ Header ─────────────────────────────────────────────────────┐
-│ Logo «Фотопринт·Контроль»   сценарий: [main ▾]  [Сброс демо]   │
-│ «неделя 45 · 02.11.2026»   кнопки: [Оформить] [+14 дней] [PDF]│
-└─────────────────────────────────────────────────────────────┘
-┌─────────────────────────────────────────────────────────────┐
-│  Алерты (слева, 320px)  │  KPI grid (4×3)  │ Loss counter    │
-│                         │                  │  (справа, sticky)│
-└─────────────────────────────────────────────────────────────┘
-┌ What-if панель (ползунок 4–6) ─────────────────────────────┐
-├ ChainPanel (раскрывается) ─────────────────────────────────┤
-├ ForecastCard ────── UnitEconTable ──────── JournalTable ───┤
-```
+### 10.1.2. Тема `swiss` — «Швейцарская полиграфическая сводка»
+Персона: директор / человек в возрасте. Светлая по умолчанию (бумага #F6F4F0). Карточки .card
+с тонкой линией и radius 4px, жирные заголовки Golos Text, крупные табличные цифры IBM Plex Mono,
+высокий контраст, много воздуха между блоками (gap!=0). WhatIfSlider = Braun/Rams-ползунок
+(.slider). Акценты Pantone. Тёмный режим = тёплые серые (#1A1917), НЕ синие slate.
 
-Тёмная тема.
+### 10.1.3. Тема `investor` — «Annual Report / Board Deck»
+Персона: инвестор / совет директоров. Акцент на деньгах и тренде: цифры-герои (Маржа, +22 120 BYN),
+sparkline выручки вместо клемм, unit-экономика как в глянцевом отчёте. Шрифты: Playfair Display
+(заголовки) + Inter Tight (цифры) + Newsreader italic. Акцент бронза/золото (--accent).
 
-Палитра:
-```css
---bg:#0B0F14; --panel:#121821; --border:#1E293B;
---text:#E5EDF5; --muted:#94A3B8;
---red:#EF4444; --amber:#F59E0B; --green:#22C55E;
---accent:#38BDF8; --accent-2:#A855F7;
-```
-Типографика: `Inter` (fallback: system-ui), заголовки 700, цифры `tabular-nums`.
+### 10.1.4. Тема `zen` — «Скандинавский вайб-дзен»
+Персона: менеджер, уставший от визуального шума. Тёплые природные тона: овсяный фон, терракота
+(--alert/--clay), охра (--warn/--ochre), шалфей (--ok/--sage). Скругления 20px, мягкие тени,
+плавные анимации (breathe-dot, calm-stream). Шрифты: Plus Jakarta Sans (display), JetBrains Mono
+(цифры), Instrument Serif (AiNote). Ползунок = zen-slider (мягкий, скруглённый).
 
+### 10.1.5. Переключатель тем и режимов
+Четыре темы × два режима (dark/light) = 8 комбинаций токенов в theme.css. Контракт имён токенов
+ФИКСИРОВАН (одинаковый набор во всех 8), меняются только значения; шрифты/радиус/тень — уровень
+[data-theme], цвета — уровень [data-theme][data-mode]. Компонент ThemeSwitcher + useThemeStore
+(zustand+persist), применение через documentElement.dataset. Дефолт в index.html: data-theme=mission
+data-mode=dark. Правила: цвет/радиус/тень — ТОЛЬКО из var(--токен); НИКОГДА hex-класс Tailwind по
+памяти (text-red-400, bg-slate-900, rounded-xl, shadow-lg) — они ломают переключение.
 ### 10.2. `Dashboard.tsx` — структура компонентов
 
 ```
@@ -1139,7 +1145,7 @@ async def send_message(text: str, chat_id: str) -> Notification:
 
 `integrations/jira.py`: `next_key()` из SQLite `counter` → `"PROD-" + n`, начиная с 1234. `create(decision)` → запись `{key, decision_id, url: f"http://{lan_ip()}:8000/api/jira/{key}"}`. `GET` отдаёт поля решения + статус.
 
-### 11.3. Gemini
+### 11.3. DeepSeek (klinch cloud)
 
 ```python
 async def interpret(ctx: dict) -> AiDTO:
@@ -1148,13 +1154,34 @@ async def interpret(ctx: dict) -> AiDTO:
     if cached: return cached | {"source": "cache"}
     if not settings.ai_enabled or settings.offline_mode:
         return fallback(ctx)
-    raw = await call_gemini(ctx)           # timeout 5
+    raw = await call_deepseek(ctx)         # OpenAI SDK, timeout 5, temperature=0
     ok, reason = validate(raw, ctx)
     if not ok: return fallback(ctx) | {"reason": reason}
-    return AiDTO(**raw, source="gemini")
+    return AiDTO(**raw, source="deepseek")
 ```
 
-Prompt (зафиксирован в `integrations/gemini.py`):
+Клиент (в `integrations/ai_provider.py`):
+
+```python
+from openai import AsyncOpenAI
+
+client = AsyncOpenAI(
+    api_key=settings.klinch_api_key,
+    base_url=settings.deepseek_base_url,   # https://api.klinch.cloud/v1
+    timeout=5,
+)
+
+resp = await client.chat.completions.create(
+    model=settings.deepseek_model,         # deepseek-flash
+    temperature=0,
+    response_format={"type": "json_object"},
+    messages=[{"role": "system", "content": SYSTEM_PROMPT},
+              {"role": "user", "content": ctx_json}],
+)
+raw = json.loads(resp.choices[0].message.content)
+```
+
+Prompt (зафиксирован в `integrations/ai_provider.py`):
 
 ```
 system: Ты ассистент управленческой аналитики.
@@ -1192,7 +1219,7 @@ JSON-схема — как в §5 плана.
 | Прогноз пика 47 | `ForecastCard` | `test_api::test_forecast` |
 | Unit-экономика | `UnitEconTable.tsx` | `test_api::test_unit` |
 | Executive PDF | `pdf.py` | `test_pdf` |
-| Gemini + валидация | `gemini.py` | `test_ai_guard` |
+| DeepSeek + валидация | `ai_provider.py` | `test_ai_guard` |
 | Кэш ответов в репо | `data/ai_cache.json` | — |
 
 ---
@@ -1216,7 +1243,7 @@ JSON-схема — как в §5 плана.
 3. Не добавлять зависимостей без записи в `docs/adr/`.
 4. Не менять `core/impact.py` без прогона `uv run pytest -q`.
 5. Webhook/polling-бот для Telegram — не нужен (только исходящий sendMessage).
-6. Telegram/Gemini не блокируют UI: всё через фолбэки.
+6. Telegram/DeepSeek не блокируют UI: всё через фолбэки.
 7. Русский язык в UI; `ru-RU` даты; валюта — `BYN`.
 8. Комментарии в коде — по-русски, короткие. Никаких TODO без задачи в `pitch/backlog.md`.
 9. Не делать обобщения: только то, что нужно демо.
@@ -1260,7 +1287,7 @@ GET /api/whatif для 4/5/6 → точно 14/8/2, 23/11/3, 41200/44900/47600, 
 - `feat/ui-shell` — layout, тема, навигация, Dashboard (скелет).
 - `feat/ui-charts` — графики, LossCounter, ChainPanel.
 - `feat/ui-decision` — формы, журнал, Telegram.
-- `feat/ai-report` — Gemini+PDF.
+- `feat/ai-report` — DeepSeek+PDF.
 - `feat/pitch` — слайды, script.
 
 Мерж: `main`. Каждый merge прогоняет `pytest` + `npm run build`.
@@ -1336,7 +1363,7 @@ GET /api/whatif для 4/5/6 → точно 14/8/2, 23/11/3, 41200/44900/47600, 
 **T3.5.** `api/forecast.py`, `api/unit_econ.py`.
 **T3.6.** `db.py` + `api/decisions.py`.
 **T3.7.** `integrations/jira.py`, `integrations/telegram.py`.
-**T3.8.** `api/ai.py` + `integrations/gemini.py`.
+**T3.8.** `api/ai.py` + `integrations/ai_provider.py`.
 **T3.9.** `report/pdf.py` + `api/report.py`.
 **T3.10.** `tests/test_api.py` — по DTO.
 
@@ -1456,9 +1483,9 @@ def test_foreign_number_rejected():
 
 | Риск | Вероятность | Действие |
 |---|---|---|
-| Нет интернета | высокая | `OFFLINE_MODE=true`, весь UI на localhost, Gemini из кэша, Telegram → журнал отправок |
+| Нет интернета | высокая | `OFFLINE_MODE=true`, весь UI на localhost, DeepSeek из кэша, Telegram → журнал отправок |
 | Telegram токен пуст/заблокирован | средняя | `status=skipped_no_token`, journal + скринкаст телефона |
-| Gemini таймаут/брак | средняя | timeout 5, validator, fallback-шаблон |
+| DeepSeek таймаут/брак | средняя | timeout 5, validator, fallback-шаблон |
 | Python 3.14 + reportlab без wheel | средняя | `uv python pin 3.12`, пересборка |
 | Граф разошёлся с UI | низкая | Один источник (API) + тесты |
 | Числа не сходятся (побились) | низкая | `test_anchors`, `test_simulate` |

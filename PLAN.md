@@ -14,7 +14,7 @@
 ## 1. Контекст-выжимка (чтобы не перечитывать всё)
 - Продукт: управленческий MVP фабрики фотокниг. Петля: видит отклонение → причина в BYN → решение → доставка (Jira-мок + Telegram) → проверка «было→стало» (+14 дней) → негативная ветка-коррекция.
 - Слои (не перепрыгивать): data/*.json → app/core/ (чистая математика, без FastAPI) → app/api/ (тонкие роутеры, DTO in/out) → frontend (только отрисовка).
-- Стек: Python 3.12 (pin, ADR-0001; НЕ 3.14), FastAPI+Pydantic v2+uvicorn, uv; SQLite (журнал); React 19+TS+Vite+Tailwind v4+Recharts+zustand+TanStack Query+framer-motion; reportlab (PDF, DejaVu); httpx (Gemini REST, Telegram); pytest+httpx AsyncClient.
+- Стек: Python 3.12 (pin, ADR-0001; НЕ 3.14), FastAPI+Pydantic v2+uvicorn, uv; SQLite (журнал); React 19+TS+Vite+Tailwind v4+Recharts+zustand+TanStack Query+framer-motion; reportlab (PDF, DejaVu); OpenAI SDK (DeepSeek через klinch cloud), httpx (Telegram); pytest+httpx AsyncClient.
 - Инварианты (не ломать никогда):
   * ANCHORS what-if: ops 4→(downtime 14, sla 23, revenue 41200, loss 1840); 5→(8,11,44900,980); 6→(2,3,47600,260).
   * effect_14d = (1840−260)×14 = 22120; defect now/after/neg = 9/4/11; loss_neg = 2170.
@@ -35,7 +35,7 @@
 ## 3. Очередь задач
 
 ### ЭТАП 3 — API и интеграции (06.11)
-- [ ] **A1 · DTO + read-only эндпоинты** (§9.1–9.3; T3.1–T3.5)
+- [x] **A1 · DTO + read-only эндпоинты** (§9.1–9.3; T3.1–T3.5)
   ФАЙЛЫ: создать backend/app/schemas.py; backend/app/api/{dashboard,graph,slices,whatif,forecast,unit_econ}.py; backend/tests/test_api.py; править backend/app/main.py (роутеры prefix=/api, глобальный Exception→500 {detail}).
   ПРИЁМКА:
   1) schemas.py: Norm, GraphNode, GraphEdge, Snapshot (§9.1) + KpiDTO, AlertDTO, SlicDescDTO, DashboardDTO, ChainDTO, SliceDTO, WhatIfDTO, WhatIfDeltaDTO, RecommendedDTO, ForecastDTO, UnitEconDTO (§9.3); поля дословно из Readme, без выдумывания.
@@ -45,11 +45,11 @@
   5) POST /api/whatif value=99 → 400 {detail} (ничего не падает, §9.4).
   6) Тесты: test_whatif_anchor_points (4/5/6 → кортежи из §1 инвариантов); test_dashboard; test_chain; test_bad_input.
   7) `uv run pytest -q` зелёный (ожидание ≥55 passed).
-  НЕ ДЕЛАТЬ: decisions/telegram/jira/gemini/pdf; frontend; core/.
+  НЕ ДЕЛАТЬ: decisions/telegram/jira/ai/pdf; frontend; core/.
   ПРОВЕРКА: pytest; uvicorn → /docs прокликать whatif(5)→(8,11,44900,980), chain, forecast, unit-economics.
   КОММИТ: feat(api): DTO + read-only endpoints (stage 3.1)
 
-- [ ] **A2 · Решения + SQLite + Jira-мок + Telegram** (§9.2, §11.1–11.2; T3.6–T3.7)
+- [x] **A2 · Решения + SQLite + Jira-мок + Telegram** (§9.2, §11.1–11.2; T3.6–T3.7)
   ФАЙЛЫ: создать backend/app/db.py; backend/app/api/{decisions,jira_mock,notifications}.py; backend/app/integrations/{jira,telegram}.py; backend/tests/test_telegram.py; править main.py, tests/test_api.py.
   ПРИЁМКА:
   1) state.db (gitignored): таблицы decisions, jira_counter (старт 1234), notifications; init при старте.
@@ -59,20 +59,20 @@
   5) GET /api/jira/PROD-1234 → 200 (поля решения + url).
   6) telegram.send_message: нет токена ИЛИ OFFLINE_MODE → skipped_no_token; сетевая ошибка/не-200 → failed; 200 → sent; timeout 3 c; исключение НЕ уходит выше.
   7) Тесты: test_create_decision; test_jira; test_telegram_off; test_simulate_endpoint. pytest зелёный.
-  НЕ ДЕЛАТЬ: gemini/pdf; frontend; webhook/polling-бот (только исходящий sendMessage).
+  НЕ ДЕЛАТЬ: ai/pdf; frontend; webhook/polling-бот (только исходящий sendMessage).
   КОММИТ: feat(api): decisions + sqlite + jira + telegram (stage 3.2)
 
-- [ ] **A3 · Gemini с анти-галлюцинацией + Executive PDF** (§11.3–11.4; T3.8–T3.10)
-  ФАЙЛЫ: создать backend/app/integrations/gemini.py; backend/app/api/ai.py; backend/app/report/{context,pdf}.py; backend/app/api/report.py; backend/app/report/fonts/DejaVuSans.ttf + DejaVuSans-Bold.ttf (ЗАКОММИТИТЬ); backend/tests/test_ai_guard.py; править tests/test_api.py (test_pdf, test_ai_health), main.py.
+- [x] **A3 · AI с анти-галлюцинацией + Executive PDF** (§11.3–11.4; T3.8–T3.10)
+  ФАЙЛЫ: создать backend/app/integrations/ai.py; backend/app/api/ai.py; backend/app/report/{context,pdf}.py; backend/app/api/report.py; backend/app/report/fonts/DejaVuSans.ttf + DejaVuSans-Bold.ttf (ЗАКОММИТИТЬ); backend/tests/test_ai_guard.py; править tests/test_api.py (test_pdf, test_ai_health), main.py.
   ПРИЁМКА:
-  1) gemini.interpret(ctx): ключ sha256(json(ctx,sort_keys)) → кэш data/ai_cache.json; hit → source="cache"; offline/AI_ENABLED=false → fallback source="fallback"; online: httpx POST, temperature=0, response_schema, timeout 5 → validate → ok: source="gemini", иначе fallback + reason.
+  1) ai.interpret(ctx): ключ sha256(json(ctx,sort_keys)) → кэш data/ai_cache.json; hit → source="cache"; offline/AI_ENABLED=false → fallback source="fallback"; online: OpenAI SDK, temperature=0, response_format, timeout 5 → validate → ok: source="deepseek", иначе fallback + reason.
   2) validate(raw,ctx): числа/сущности вне whitelist ctx → (False, reason с токеном). Тест: ctx={"margin":32,"cost":1840}, raw.interpretation="маржа 99%" → ok==False и "99" in reason.
   3) GET /api/ai/health → {enabled, model, cache_size}.
   4) pdf.py: reportlab platypus, A4, DejaVuSans (кириллица); блоки: топ-3 отклонения+причины, cost of inaction, решения (owner/due/verdict), «было→стало»; GET /api/report/executive.pdf?scenario=main → 200 application/pdf; bytes startswith b"%PDF-1.4"; текст содержит «Маржинальность».
   5) `uv run pytest -q` зелёный (ожидание ≥60 passed).
-  НЕ ДЕЛАТЬ: frontend; SDK Gemini (только httpx REST); оставлять ttf вне репо.
+  НЕ ДЕЛАТЬ: frontend; SDK DeepSeek (только OpenAI SDK); оставлять ttf вне репо.
   ПРОВЕРКА: pytest; скачать PDF из /docs и открыть — кириллица читается.
-  КОММИТ: feat(api): gemini guard + exec pdf (stage 3.3)
+  КОММИТ: feat(api): AI guard + exec pdf (stage 3.3)
 
   **GATE G1 (конец Этапа 3):** pytest ≥60 passed; в /docs все эндпоинты §9.2 отвечают 200/400-по-правилу; PDF открывается; POST /api/decisions даёт PROD-1234. Бэкенд ПОЛНОСТЬЮ готов.
 
@@ -136,7 +136,7 @@
   2) AiNote на демо-сценах отвечает <2 c из кэша (source="cache"); при offline — fallback без блокировки UI.
   3) prefill_cache.py прогоняет 5 сцен: chain fin_margin(main), whatif ops=6, forecast peak, simulate main, simulate neg; каждый ответ прошёл validate(); /api/ai/health → cache_size ≥ 5.
   4) build зелёный; pytest зелёный (test_ai_guard не сломан).
-  НЕ ДЕЛАТЬ: вызывать Gemini на площадке; менять промпт/схему gemini.py.
+  НЕ ДЕЛАТЬ: вызывать AI на площадке; менять промпт/схему ai.py.
   КОММИТ: feat(ai,ui): prefill cache + report page (stage 7)
 
   **GATE G3:** полный демо-трек §16.2 (10 шагов) руками ≤ 4:00 на чистом state; затем OFFLINE_MODE=true + выключенный Wi-Fi — трек проходит целиком.
@@ -148,7 +148,7 @@
   1) demoScript ≤ 4:00 (цель 3:40).
   2) «Сброс демо» → чистый main-state; повторный трек без артефактов.
   3) `cd backend; uv run python -m app.serve` → фронт+API на :8000; телефон по LAN-IP открывает /decision/:id.
-  4) OFFLINE_MODE=true, Wi-Fi off: трек проходит (Gemini=cache, telegram=skipped_no_token+журнал, PDF локальный).
+  4) OFFLINE_MODE=true, Wi-Fi off: трек проходит (DeepSeek=cache, telegram=skipped_no_token+журнал, PDF локальный).
   5) pitch/coverage.md: все 16 галочек §17.2 проставлены и соответствуют коду.
   6) Финальный DoD (§15.3): pytest зелёный; build зелёный; grep пуст; /api/health 200; DevTools Network в offline — ноль внешних запросов; PDF открывается в Adobe Reader.
   НЕ ДЕЛАТЬ: любые новые фичи после этой задачи. **CODE FREEZE.**
@@ -170,8 +170,8 @@
 | Задача | Дата | pytest | npm build | Примечание |
 |---|---|---|---|---|
 | A1 | | | | |
-| A2 | | | | |
-| A3 | 07.11.2026 | 67 passed | N/A (на очереди) | Gemini guard, exec PDF, роутеры - выполнено. |
+| A2 | 07.11.2026 | 68 passed | N/A (на очереди) | decisions + sqlite + jira-мок + telegram; PROD-1234 создаётся. |
+| A3 | 07.11.2026 | 68 passed | N/A (на очереди) | guard анти-галлюцинаций (кэш + validate), exec PDF с кириллицей, роутеры. Провайдер заменён Gemini→DeepSeek (klinch cloud), см. ADR-0003. |
 | B1 | | | | |
 | B2 | | | | |
 | B3 | | | | |
@@ -185,8 +185,8 @@ Conventional: `feat(api): …`, `feat(ui): …`, `chore: …`. После каж
 ## 7. Фолбэки-шпаргалка (§16.1)
 | Риск | Действие |
 |---|---|
-| Нет интернета | OFFLINE_MODE=true; Gemini из кэша; Telegram → журнал отправок |
-| Gemini таймаут/брак | timeout 5 → validate → fallback-шаблон |
+| Нет интернета | OFFLINE_MODE=true; DeepSeek из кэша; Telegram → журнал отправок |
+| DeepSeek таймаут/брак | timeout 5 → validate → fallback-шаблон |
 | Telegram токен пуст | status=skipped_no_token + NotificationLog + скринкаст |
 | Демо упало | backup-demo-v2.mp4 (2 флешки) + .zip репо |
 | Чужие цифры в AI | test_ai_guard + предзаполненный кэш |
