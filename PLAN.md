@@ -171,7 +171,7 @@
 |---|---|---|---|---|
 | A1 | | | | |
 | A2 | 07.11.2026 | 68 passed | N/A (на очереди) | decisions + sqlite + jira-мок + telegram; PROD-1234 создаётся. |
-| A3 | 07.11.2026 | 68 passed | N/A (на очереди) | guard анти-галлюцинаций (кэш + validate), exec PDF с кириллицей, роутеры. Провайдер заменён Gemini→DeepSeek (klinch cloud), см. ADR-0003. |
+| A3 | 07.11.2026 | 80 passed | N/A (на очереди) | guard анти-галлюцинаций (кэш + validate), exec PDF с кириллицей, роутеры. Провайдер заменён Gemini→DeepSeek (klinch cloud), см. ADR-0003. Позже добавлен `GET /api/report/executive.pdf` (report/tables.py: фикс пустой таблицы решений) + `test_pdf.py` → 82 passed. |
 | B1 | | | | |
 | B2 | | | | |
 | B3 | | | | |
