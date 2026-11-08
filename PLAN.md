@@ -77,7 +77,7 @@
   **GATE G1 (конец Этапа 3):** pytest ≥60 passed; в /docs все эндпоинты §9.2 отвечают 200/400-по-правилу; PDF открывается; POST /api/decisions даёт PROD-1234. Бэкенд ПОЛНОСТЬЮ готов.
 
 ### ЭТАП 4 — UI-каркас (07.11)
-- [ ] **B1 · types/api-слой/сторы/layout/тема** (§4.2, §10.1; T4.1–T4.5)
+- [x] **B1 · types/api-слой/сторы/layout/тема** (§4.2, §10.1; T4.1–T4.5)
   ФАЙЛЫ: frontend/vite.config.ts (proxy /api→http://127.0.0.1:8000); src/api/{types,client,queries}.ts; src/store/{ui,demo}.ts; src/lib/{format,cn}.ts; src/styles/theme.css; src/components/layout/{Header,Section,Modal,Toast,DemoBadge}.tsx; src/pages/Dashboard.tsx (скелет секций); src/{App,routes,main}.tsx.
   ПРИЁМКА:
   1) types.ts — зеркало schemas.py; ни одного `any`.
@@ -172,7 +172,7 @@
 | A1 | | | | |
 | A2 | 07.11.2026 | 68 passed | N/A (на очереди) | decisions + sqlite + jira-мок + telegram; PROD-1234 создаётся. |
 | A3 | 07.11.2026 | 80 passed | N/A (на очереди) | guard анти-галлюцинаций (кэш + validate), exec PDF с кириллицей, роутеры. Провайдер заменён Gemini→DeepSeek (klinch cloud), см. ADR-0003. Позже добавлен `GET /api/report/executive.pdf` (report/tables.py: фикс пустой таблицы решений) + `test_pdf.py` → 82 passed. |
-| B1 | 08.11.2026 | 82 passed (из A3) | зелёный (tsc -b && vite build, 71 modules) | Выполнена только часть T4.1 (слой данных): api/{types,client,queries}.ts, store/ui.ts, lib/format.ts, vite-proxy, QueryClientProvider (main.tsx). Layout/тема (T4.2), store/demo (T4.3), Dashboard (T4.4) — остаются. grep 1840\|41200\|22120 и `any` — пусто. |
+| B1 | 08.11.2026 | 82 passed (из A3) | зелёный (tsc -b && vite build, 159 modules) | T4.1–T4.4 закрыты: api/{types,client,queries}.ts, store/{ui,demo}.ts, lib/format.ts, vite-proxy, QueryClientProvider (main.tsx); layout/{Section,Modal,Toast,DemoBadge}.tsx (4 состояния, esc/backdrop, очередь тостов; таймеры независимы после фикса зависимостей useEffect); routes.tsx (/, /journal, /report, /decision/:id, /devkit) + заглушки страниц; скелет Dashboard — 7 секций. Header/ThemeSwitcher из задачи темизации, react-router обоснован ADR 0004. grep 1840\|41200\|22120 и `any` — пусто. |
 | B2 | | | | |
 | B3 | | | | |
 | C1 | | | | |
