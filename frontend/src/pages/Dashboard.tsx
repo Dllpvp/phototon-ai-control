@@ -1,8 +1,14 @@
-/** Скелет Dashboard (§10.2). Данные появятся на этапе 5 (T5.x). */
+/** Dashboard — живые данные поверх скелета (§10.2–10.9, T5.x).
+ *  Секции подключаются по мере готовности подзадач.
+ */
 import { Link } from "react-router";
 
+import { useDashboard } from "../api/queries";
+import { AlertsColumn } from "../components/dashboard/AlertsColumn";
+import { KpiGrid } from "../components/dashboard/KpiGrid";
 import { DemoBadge } from "../components/layout/DemoBadge";
 import { Section } from "../components/layout/Section";
+import { useUIStore } from "../store/ui";
 
 function SkeletonLine({ width }: { width: string }) {
   return (
@@ -22,20 +28,22 @@ function PlaceholderText({ children }: { children: string }) {
 }
 
 function HeroRow() {
+  const scenario = useUIStore((s) => s.scenario);
+  const query = useDashboard(scenario);
   return (
     <Section
       title="Сводка недели"
-      subtitle={<span className="mono">—</span>}
+      subtitle={<span className="mono">{query.data?.headline ?? "—"}</span>}
       className="col-span-full"
     >
       <div className="flex flex-wrap items-end gap-6">
-        <div>
+        <div style={{ minWidth: 0 }}>
           <div className="mono text-xs" style={{ color: "var(--muted)" }}>
             Потери недели
           </div>
           <div className="mono text-3xl">—</div>
         </div>
-        <div>
+        <div style={{ minWidth: 0 }}>
           <div className="mono text-xs" style={{ color: "var(--muted)" }}>
             Маржа
           </div>
@@ -43,39 +51,6 @@ function HeroRow() {
         </div>
         <DemoBadge />
       </div>
-    </Section>
-  );
-}
-
-function KpiGrid() {
-  return (
-    <Section title="KPI" subtitle="4 метрики" className="col-span-full lg:col-span-2">
-      <div className="grid grid-cols-2 gap-3">
-        {["Выручка", "Маржа", "Потери", "Заказы"].map((label) => (
-          <div key={label} className="p-3" style={{ border: "1px solid var(--hair)" }}>
-            <div className="mono text-xs" style={{ color: "var(--muted)" }}>
-              {label}
-            </div>
-            <div className="mono text-xl">—</div>
-            <SkeletonLine width="60%" />
-          </div>
-        ))}
-      </div>
-    </Section>
-  );
-}
-
-function AlertsColumn() {
-  return (
-    <Section title="Алерты" subtitle="—">
-      <ul className="flex flex-col gap-2">
-        {[0, 1, 2].map((i) => (
-          <li key={i} className="p-2" style={{ border: "1px solid var(--hair)" }}>
-            <PlaceholderText>нет данных</PlaceholderText>
-            <SkeletonLine width="80%" />
-          </li>
-        ))}
-      </ul>
     </Section>
   );
 }
@@ -95,11 +70,23 @@ function WhatIfSection() {
 }
 
 export default function Dashboard() {
+  const scenario = useUIStore((s) => s.scenario);
+  const selectNode = useUIStore((s) => s.selectNode);
+  const query = useDashboard(scenario);
+
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
       <HeroRow />
-      <KpiGrid />
-      <AlertsColumn />
+      <Section
+        title="KPI"
+        subtitle={`${query.data?.kpis.length ?? 0} метрик`}
+        className="col-span-full lg:col-span-2"
+      >
+        <KpiGrid query={query} />
+      </Section>
+      <Section title="Алерты" subtitle={`${query.data?.alerts.length ?? 0}`}>
+        <AlertsColumn query={query} onSelect={selectNode} />
+      </Section>
       <WhatIfSection />
       <Section title="Прогноз" subtitle="4 недели">
         <SkeletonLine width="100%" />
