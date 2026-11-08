@@ -10,6 +10,7 @@ from app.api import (
     dashboard,
     decisions,
     forecast,
+    jira_mock,
     slice,
     snapshot,
     unit_econ,
@@ -26,3 +27,4 @@ router.include_router(whatif.router)
 router.include_router(forecast.router)
 router.include_router(unit_econ.router)
 router.include_router(decisions.router)
+router.include_router(jira_mock.router)

@@ -242,6 +242,7 @@ class DecisionDTO(BaseModel):
     verdict: Literal["effective", "ineffective", "pending"] = "pending"
     created_at: datetime | None = None
     jira_key: str | None = None
+    notification: NotificationDTO | None = None
 
 
 class AiDTO(BaseModel):
@@ -264,3 +265,6 @@ class NotificationDTO(BaseModel):
     status: Literal["sent", "failed", "skipped_no_token"]
     created_at: datetime
     related_decision_id: str | None = None
+
+
+DecisionDTO.model_rebuild()

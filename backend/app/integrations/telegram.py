@@ -28,6 +28,7 @@ def send_message(
     chat_id: str,
     text: str,
     subject: str = "Фотопринт·Контроль",
+    related_decision_id: str | None = None,
 ) -> NotificationDTO:
     """Отправляет сообщение в Telegram. Безопасна: никогда не бросает исключение.
 
@@ -43,6 +44,7 @@ def send_message(
             body=text,
             status="skipped_no_token",
             created_at=datetime.now(),
+            related_decision_id=related_decision_id,
         )
 
     recipient = chat_id or settings.telegram_chat_id
