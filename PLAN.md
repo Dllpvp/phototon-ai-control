@@ -172,7 +172,7 @@
 | A1 | | | | |
 | A2 | 07.11.2026 | 68 passed | N/A (на очереди) | decisions + sqlite + jira-мок + telegram; PROD-1234 создаётся. |
 | A3 | 07.11.2026 | 80 passed | N/A (на очереди) | guard анти-галлюцинаций (кэш + validate), exec PDF с кириллицей, роутеры. Провайдер заменён Gemini→DeepSeek (klinch cloud), см. ADR-0003. Позже добавлен `GET /api/report/executive.pdf` (report/tables.py: фикс пустой таблицы решений) + `test_pdf.py` → 82 passed. |
-| B1 | | | | |
+| B1 | 08.11.2026 | 82 passed (из A3) | зелёный (tsc -b && vite build, 71 modules) | Выполнена только часть T4.1 (слой данных): api/{types,client,queries}.ts, store/ui.ts, lib/format.ts, vite-proxy, QueryClientProvider (main.tsx). Layout/тема (T4.2), store/demo (T4.3), Dashboard (T4.4) — остаются. grep 1840\|41200\|22120 и `any` — пусто. |
 | B2 | | | | |
 | B3 | | | | |
 | C1 | | | | |
