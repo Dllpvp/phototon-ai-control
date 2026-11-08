@@ -15,6 +15,7 @@ from app.api import (
     snapshot,
     unit_econ,
     whatif,
+    ai,
 )
 
 router = APIRouter(prefix="/api")
@@ -28,3 +29,4 @@ router.include_router(forecast.router)
 router.include_router(unit_econ.router)
 router.include_router(decisions.router)
 router.include_router(jira_mock.router)
+router.include_router(ai.router)
