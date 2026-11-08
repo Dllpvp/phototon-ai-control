@@ -16,6 +16,7 @@ from app.api import (
     unit_econ,
     whatif,
     ai,
+    report,
 )
 
 router = APIRouter(prefix="/api")
@@ -30,3 +31,4 @@ router.include_router(unit_econ.router)
 router.include_router(decisions.router)
 router.include_router(jira_mock.router)
 router.include_router(ai.router)
+router.include_router(report.router)
