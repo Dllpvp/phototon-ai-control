@@ -12,7 +12,7 @@ from app.core.loader import GraphPayload, GraphNodePayload, ScenarioNode, load_s
 from app.dependencies import get_graph
 from app.schemas import ChainDTO, ChainNodeDTO
 
-router = APIRouter(prefix="/api", tags=["chain"])
+router = APIRouter(tags=["chain"])
 
 
 def _build_chain_node(

@@ -11,7 +11,7 @@ from app.core.forecast import forecast_for_week
 from app.core.loader import load_scenario
 from app.schemas import ForecastDTO
 
-router = APIRouter(prefix="/api", tags=["forecast"])
+router = APIRouter(tags=["forecast"])
 
 
 @router.get("/forecast", response_model=ForecastDTO)

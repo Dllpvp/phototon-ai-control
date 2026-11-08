@@ -15,7 +15,7 @@ from app.core.loader import GraphPayload, ScenarioNode, load_scenario
 from app.dependencies import get_graph
 from app.schemas import WhatIfDTO, WhatIfDeltaDTO, RecommendedDTO
 
-router = APIRouter(prefix="/api", tags=["whatif"])
+router = APIRouter(tags=["whatif"])
 
 
 class WhatIfRequest(BaseModel):

@@ -7,14 +7,14 @@ from __future__ import annotations
 
 from datetime import date, datetime
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.core.anchors import ANCHORS
 from app.core.loader import GraphNodePayload, GraphPayload, ScenarioNode, load_norms, load_scenario
 from app.dependencies import get_graph
 from app.schemas import AlertDTO, DashboardDTO, KpiDTO, Norm, SliceDescDTO
 
-router = APIRouter(prefix="/api", tags=["dashboard"])
+router = APIRouter(prefix="", tags=["dashboard"])
 
 
 def _build_norm(node: GraphNodePayload, norms: list) -> Norm | None:
@@ -110,7 +110,11 @@ async def get_dashboard(
     graph: GraphPayload = Depends(get_graph),
 ) -> DashboardDTO:
     """Дашборд: KPI сетка + алерты + loss counter."""
-    scenario_data = load_scenario(scenario)
+    try:
+        scenario_data = load_scenario(scenario)
+    except KeyError as e:
+        raise HTTPException(status_code=400, detail=f"Unknown scenario: {scenario}") from e
+    
     norms = load_norms()
     
     kpis = _build_kpis(scenario_data.nodes, graph, norms)

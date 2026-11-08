@@ -15,7 +15,7 @@ from app.schemas import DecisionDTO, SimulationDTO
 from app.core.simulate import simulate as simulate_impact
 from app.report.pdf import generate_executive_summary
 
-router = APIRouter(prefix="/api", tags=["decisions"])
+router = APIRouter(prefix="", tags=["decisions"])
 
 
 @router.post("/decisions", response_model=DecisionDTO)

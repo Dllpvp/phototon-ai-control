@@ -18,10 +18,11 @@ from pydantic import BaseModel, ConfigDict, Field
 # ──────────────────────────────────────────────────────────────────────
 
 class Norm(BaseModel):
-    """Норма метрики: нижняя/верхняя граница + единица измерения."""
+    """Норма метрики: нижняя/верхняя граница + единица измерения + мягкая граница (warn)."""
     lo: float | None = None
     hi: float | None = None
     unit: str
+    warn: float | None = None
 
 
 class GraphNode(BaseModel):
