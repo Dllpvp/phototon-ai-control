@@ -6,6 +6,7 @@ import { Link } from "react-router";
 import { useDashboard } from "../api/queries";
 import { AlertsColumn } from "../components/dashboard/AlertsColumn";
 import { KpiGrid } from "../components/dashboard/KpiGrid";
+import { LossCounter } from "../components/dashboard/LossCounter";
 import { DemoBadge } from "../components/layout/DemoBadge";
 import { Section } from "../components/layout/Section";
 import { useUIStore } from "../store/ui";
@@ -30,25 +31,23 @@ function PlaceholderText({ children }: { children: string }) {
 function HeroRow() {
   const scenario = useUIStore((s) => s.scenario);
   const query = useDashboard(scenario);
+  const data = query.data;
+  const lossKpi = data?.kpis.find((kpi) => kpi.node_id === "fin_loss_day");
   return (
     <Section
       title="Сводка недели"
-      subtitle={<span className="mono">{query.data?.headline ?? "—"}</span>}
+      subtitle={<span className="mono">{data?.headline ?? "—"}</span>}
       className="col-span-full"
     >
-      <div className="flex flex-wrap items-end gap-6">
-        <div style={{ minWidth: 0 }}>
-          <div className="mono text-xs" style={{ color: "var(--muted)" }}>
-            Потери недели
+      <div className="flex flex-wrap items-end justify-between gap-6">
+        {data && lossKpi ? (
+          <LossCounter lossDay={lossKpi.value} startedAt={data.loss_counter_started_at} />
+        ) : (
+          <div className="flex flex-col gap-1" style={{ minWidth: 0 }}>
+            <SkeletonLine width="9rem" />
+            <SkeletonLine width="14rem" />
           </div>
-          <div className="mono text-3xl">—</div>
-        </div>
-        <div style={{ minWidth: 0 }}>
-          <div className="mono text-xs" style={{ color: "var(--muted)" }}>
-            Маржа
-          </div>
-          <div className="mono text-3xl">—</div>
-        </div>
+        )}
         <DemoBadge />
       </div>
     </Section>
