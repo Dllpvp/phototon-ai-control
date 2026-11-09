@@ -120,7 +120,7 @@ async def test_forecast_peak():
 
 @pytest.mark.asyncio
 async def test_unit_economics():
-    """GET /api/unit-economics → 200, список из 5 элементов, первый содержит маржу ~28.3% (или маржинальный SKU)."""
+    """GET /api/unit-economics → 200, 5 строк с точными SKU и маржами, статус red только для -1.9%"""
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.get("/api/unit-economics")
@@ -128,9 +128,19 @@ async def test_unit_economics():
         items = response.json()
         assert isinstance(items, list)
         assert len(items) == 5
-        # Последний элемент (margin_per_order) должен иметь margin_pct = 0.32 (32%) или первый ~28.3% в зависимости от данных
-        margins = [i["margin_pct"] for i in items]
-        assert any(m > 0 for m in margins)
+        # Ожидаемые данные из seed
+        expected = [
+            {"sku": "Фотокнига 20×20 стандарт", "margin_pct": 28.3, "status": "green"},
+            {"sku": "Фотокнига 30×30 премиум", "margin_pct": 35.2, "status": "green"},
+            {"sku": "B2B фотостудия «Луч»", "margin_pct": 35.6, "status": "green"},
+            {"sku": "B2B маркетплейс «Книга»", "margin_pct": 34.7, "status": "green"},
+            {"sku": "Клиент №7", "margin_pct": -1.9, "status": "red"},
+        ]
+        for exp in expected:
+            match = next((item for item in items if item["sku"] == exp["sku"]), None)
+            assert match is not None, f"Missing SKU {exp['sku']}"
+            assert match["margin_pct"] == exp["margin_pct"], f"Margin mismatch for {exp['sku']}"
+            assert match["status"] == exp["status"], f"Status mismatch for {exp['sku']}"
 
 
 @pytest.mark.asyncio

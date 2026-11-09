@@ -195,7 +195,7 @@ def unit_economics() -> list[UnitEconDTO]:
             labor=row.labor,
             defect=row.defect,
             margin_pct=row.margin_pct,
-            status=node_status(row.margin_pct, norm),  # type: ignore[arg-type]
+            status="red" if norm and row.margin_pct < (norm.min or float('-inf')) else "green",
         )
         for row in rows
     ]
