@@ -5,12 +5,14 @@ import { Link } from "react-router";
 
 import { useDashboard } from "../api/queries";
 import { AlertsColumn } from "../components/dashboard/AlertsColumn";
+import { ChainPanel } from "../components/chain/ChainPanel";
 import { KpiGrid } from "../components/dashboard/KpiGrid";
 import { LossCounter } from "../components/dashboard/LossCounter";
 import { UnitEconTable } from "../components/dashboard/UnitEconTable";
 import { DemoBadge } from "../components/layout/DemoBadge";
 import { Section } from "../components/layout/Section";
 import { useUIStore } from "../store/ui";
+
 
 function SkeletonLine({ width }: { width: string }) {
   return (
@@ -55,6 +57,25 @@ function HeroRow() {
   );
 }
 
+function ChainPanelSection() {
+  const selectedNodeId = useUIStore((s) => s.selectedNodeId);
+  const asOf = useUIStore((s) => s.as_of);
+  
+  if (!selectedNodeId) {
+    return null;
+  }
+
+  return (
+    <Section
+      title="Цепочка причины"
+      subtitle={asOf ? <span className="mono">{asOf}</span> : "—"}
+      className="col-span-full"
+    >
+      <ChainPanel selectedNodeId={selectedNodeId} />
+    </Section>
+  );
+}
+
 function WhatIfSection() {
   return (
     <Section title="What-If" subtitle="ползунок ↓" className="col-span-full">
@@ -87,6 +108,7 @@ export default function Dashboard() {
       <Section title="Алерты" subtitle={`${query.data?.alerts.length ?? 0}`}>
         <AlertsColumn query={query} onSelect={selectNode} />
       </Section>
+      <ChainPanelSection />
       <WhatIfSection />
       <Section title="Прогноз" subtitle="4 недели">
         <SkeletonLine width="100%" />
