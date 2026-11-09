@@ -143,6 +143,7 @@ export interface UnitEconDTO {
   labor: number;
   defect: number;
   margin_pct: number;
+  status: "red" | "yellow" | "green";
 }
 
 export interface ChainNodeDTO {

@@ -7,6 +7,7 @@ import { useDashboard } from "../api/queries";
 import { AlertsColumn } from "../components/dashboard/AlertsColumn";
 import { KpiGrid } from "../components/dashboard/KpiGrid";
 import { LossCounter } from "../components/dashboard/LossCounter";
+import { UnitEconTable } from "../components/dashboard/UnitEconTable";
 import { DemoBadge } from "../components/layout/DemoBadge";
 import { Section } from "../components/layout/Section";
 import { useUIStore } from "../store/ui";
@@ -90,8 +91,8 @@ export default function Dashboard() {
       <Section title="Прогноз" subtitle="4 недели">
         <SkeletonLine width="100%" />
       </Section>
-      <Section title="Юнит-экономика" subtitle="—">
-        <SkeletonLine width="100%" />
+      <Section title="Юнит-экономика" subtitle="маржа по SKU, %">
+        <UnitEconTable />
       </Section>
       <Section title="Журнал" subtitle="последние решения">
         <PlaceholderText>записей нет</PlaceholderText>
