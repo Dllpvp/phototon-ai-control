@@ -4,12 +4,15 @@ import { useChain, useSlice } from "../../api/queries";
 import { AsyncState } from "../dashboard/AsyncState";
 import { ChainBreadcrumbs } from "../graph/ChainBreadcrumbs";
 import { ChainStep } from "../graph/ChainStep";
+import { useUIStore } from "../../store/ui";
+import { AiNote } from "./AiNote";
 
 interface ChainPanelProps {
   selectedNodeId: string | null;
 }
 
 export function ChainPanel({ selectedNodeId }: ChainPanelProps) {
+  const scenario = useUIStore((s) => s.scenario);
   const chainQuery = useChain(selectedNodeId);
 
   const sliceParams = useMemo(() => {
@@ -64,6 +67,10 @@ export function ChainPanel({ selectedNodeId }: ChainPanelProps) {
               sliceQuery={sliceQuery}
               edgeNote={null}
             />
+          </div>
+
+          <div className="mt-4">
+            <AiNote scene={scenario} chain={chainData.chain} />
           </div>
         </div>
       )}
