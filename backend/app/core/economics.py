@@ -170,3 +170,32 @@ def node_cost_per_day(
 
     # Для производственных метрик — нет прямой оценки в день
     return None
+
+
+def unit_economics() -> list[UnitEconDTO]:
+    """Юнит-экономика: 5 строк из §7.8 Readme.md.
+
+    Данные из `unit_economics.json` (через loader) + расчет статуса
+    по общей норме `unit_econ_margin`.
+    """
+    from app.core.loader import load_unit_economics, load_norms
+    from app.schemas import UnitEconDTO
+
+    rows = load_unit_economics()
+    norms = load_norms()
+    norm = next((n for n in norms if n.metric == "unit_econ_margin"), None)
+
+    return [
+        UnitEconDTO(
+            sku=row.sku,
+            price=row.price,
+            paper=row.paper,
+            printing=row.printing,
+            binding=row.binding,
+            labor=row.labor,
+            defect=row.defect,
+            margin_pct=row.margin_pct,
+            status=node_status(row.margin_pct, norm),  # type: ignore[arg-type]
+        )
+        for row in rows
+    ]

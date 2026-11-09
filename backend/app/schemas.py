@@ -167,6 +167,7 @@ class UnitEconDTO(BaseModel):
     labor: float
     defect: float
     margin_pct: float
+    status: Literal["red", "yellow", "green"] = "green"
 
 
 class ChainNodeDTO(BaseModel):

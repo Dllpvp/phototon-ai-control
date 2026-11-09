@@ -133,6 +133,19 @@ class FactsPayload(BaseModel):
     facts: list[FactRecord]
 
 
+class UnitEconRow(BaseModel):
+    """Строка юнит-экономики из `unit_economics.json` (§7.8)."""
+
+    sku: str
+    price: float
+    paper: float
+    printing: float
+    binding: float
+    labor: float
+    defect: float
+    margin_pct: float
+
+
 class ScenarioNode(BaseModel):
     """Переопределение узла внутри сценария (§8)."""
 
@@ -189,6 +202,13 @@ def load_facts() -> FactsPayload:
     return FactsPayload.model_validate(_read_json(DATA_DIR / "facts.json"))
 
 
+@lru_cache(maxsize=1)
+def load_unit_economics() -> list[UnitEconRow]:
+    """Юнит-экономика: 5 строк из `unit_economics.json` (§7.8)."""
+    raw = _read_json(DATA_DIR / "unit_economics.json")
+    return [UnitEconRow.model_validate(item) for item in raw]
+
+
 @lru_cache(maxsize=len(SCENARIO_IDS))
 def load_scenario(scenario_id: str) -> Scenario:
     """Фикстура сценария `main` / `neg` / `peak` (§8)."""
@@ -206,4 +226,5 @@ def clear_caches() -> None:
     load_norms.cache_clear()
     load_seasonality.cache_clear()
     load_facts.cache_clear()
+    load_unit_economics.cache_clear()
     load_scenario.cache_clear()

@@ -9,6 +9,10 @@
 
 Факты — это не граф, а «доказательство для графиков» и сверка с нормами.
 Сценарии (main/neg/peak) накладываются поверх отдельно (app/data/scenarios).
+
+Также создаёт:
+- `<out>/norms.json` — нормы метрик (§5.4), включая unit_econ_margin для юнит-экономики
+- `<out>/unit_economics.json` — 5 строк таблицы §7.8
 """
 
 from __future__ import annotations
@@ -95,12 +99,91 @@ def generate(rng: random.Random) -> list[dict]:
     return facts
 
 
+def generate_norms() -> list[dict]:
+    """Нормы метрик (§5.4) + норма для юнит-экономики (§7.8).
+    
+    Возвращает 9 записей: 8 базовых + unit_econ_margin.
+    """
+    return [
+        {"metric": "fin_margin", "domain": "finance", "min": 35, "max": 40, "unit": "%", "warn": 33},
+        {"metric": "prod_downtime_l2", "domain": "production", "min": 0, "max": 4, "unit": "ч/сут"},
+        {"metric": "quality_defect_rate", "domain": "quality", "min": 2, "max": 5, "unit": "%"},
+        {"metric": "sales_sla_breach", "domain": "clients", "min": 0, "max": 5, "unit": "зак/сут"},
+        {"metric": "hr_operators_s3", "domain": "hr", "min": 6, "max": 7, "unit": "чел"},
+        {"metric": "hr_overtime_s3", "domain": "hr", "min": 0, "max": 6, "unit": "ч/сут"},
+        {"metric": "prod_reprint_volume", "domain": "production", "min": 0, "max": 3, "unit": "тираж/сут"},
+        {"metric": "sales_churn_risk_b2b7", "domain": "clients", "min": 0, "max": 20, "unit": "% (риск)"},
+        # Норма для юнит-экономики (§7.8): маржа должна быть 15–45%
+        {"metric": "unit_econ_margin", "domain": "finance", "min": 15, "max": 45, "unit": "%", "warn": 20},
+    ]
+
+
+def generate_unit_economics() -> list[dict]:
+    """5 строк таблицы юнит-экономики §7.8 Readme.md.
+    
+    SKU/Клиент, Цена, Бумага, Печать, Переплёт, Труд, Брак, Маржа %.
+    Все числа — точно из таблицы §7.8.
+    """
+    return [
+        {
+            "sku": "Фотокнига 20×20 стандарт",
+            "price": 92.0,
+            "paper": 21.0,
+            "printing": 12.0,
+            "binding": 18.0,
+            "labor": 15.0,
+            "defect": 2.0,
+            "margin_pct": 28.3,
+        },
+        {
+            "sku": "Фотокнига 30×30 премиум",
+            "price": 210.0,
+            "paper": 48.0,
+            "printing": 22.0,
+            "binding": 34.0,
+            "labor": 28.0,
+            "defect": 4.0,
+            "margin_pct": 35.2,
+        },
+        {
+            "sku": "B2B фотостудия «Луч»",
+            "price": 180.0,
+            "paper": 40.0,
+            "printing": 20.0,
+            "binding": 30.0,
+            "labor": 24.0,
+            "defect": 3.0,
+            "margin_pct": 35.6,
+        },
+        {
+            "sku": "B2B маркетплейс «Книга»",
+            "price": 150.0,
+            "paper": 36.0,
+            "printing": 16.0,
+            "binding": 24.0,
+            "labor": 20.0,
+            "defect": 2.0,
+            "margin_pct": 34.7,
+        },
+        {
+            "sku": "Клиент №7",
+            "price": 140.0,
+            "paper": 30.0,
+            "printing": 18.0,
+            "binding": 22.0,
+            "labor": 25.0,
+            "defect": 48.0,
+            "margin_pct": -1.9,
+        },
+    ]
+
+
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Генератор facts.json (детерминированный)")
+    parser = argparse.ArgumentParser(description="Генератор facts.json, norms.json, unit_economics.json (детерминированный)")
     parser.add_argument(
         "--out",
         default=str(Path(__file__).resolve().parents[2] / "data"),
-        help="Каталог для facts.json (по умолчанию backend/data)",
+        help="Каталог для выходных файлов (по умолчанию backend/data)",
     )
     args = parser.parse_args(argv)
 
@@ -110,7 +193,9 @@ def main(argv: list[str] | None = None) -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     rng = random.Random(42)
-    payload = {
+
+    # 1. facts.json
+    payload_facts = {
         "period": {
             "from": PERIOD_FROM.isoformat(),
             "to": PERIOD_TO.isoformat(),
@@ -118,10 +203,22 @@ def main(argv: list[str] | None = None) -> int:
         },
         "facts": generate(rng),
     }
+    out_facts = out_dir / "facts.json"
+    out_facts.write_text(json.dumps(payload_facts, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(f"facts.json: {len(payload_facts['facts'])} записей -> {out_facts}")
 
-    out_file = out_dir / "facts.json"
-    out_file.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"facts.json: {len(payload['facts'])} записей -> {out_file}")
+    # 2. norms.json
+    norms = generate_norms()
+    out_norms = out_dir / "norms.json"
+    out_norms.write_text(json.dumps(norms, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(f"norms.json: {len(norms)} записей -> {out_norms}")
+
+    # 3. unit_economics.json
+    unit_econ = generate_unit_economics()
+    out_unit_econ = out_dir / "unit_economics.json"
+    out_unit_econ.write_text(json.dumps(unit_econ, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(f"unit_economics.json: {len(unit_econ)} записей -> {out_unit_econ}")
+
     return 0
 
 
