@@ -3,14 +3,16 @@
  */
 import { Link } from "react-router";
 
-import { useDashboard } from "../api/queries";
+import { useDashboard, useForecast } from "../api/queries";
 import { AlertsColumn } from "../components/dashboard/AlertsColumn";
 import { ChainPanel } from "../components/chain/ChainPanel";
+import { ForecastCard } from "../components/dashboard/ForecastCard";
 import { KpiGrid } from "../components/dashboard/KpiGrid";
 import { LossCounter } from "../components/dashboard/LossCounter";
 import { UnitEconTable } from "../components/dashboard/UnitEconTable";
 import { DemoBadge } from "../components/layout/DemoBadge";
 import { Section } from "../components/layout/Section";
+import { WhatIfSlider } from "../components/whatif/WhatIfSlider";
 import { useUIStore } from "../store/ui";
 
 
@@ -79,13 +81,17 @@ function ChainPanelSection() {
 function WhatIfSection() {
   return (
     <Section title="What-If" subtitle="ползунок ↓" className="col-span-full">
-      <div
-        className="h-2 w-full"
-        style={{ background: "var(--panel-2)", borderRadius: "var(--radius)" }}
-      />
-      <div className="mt-3">
-        <PlaceholderText>эффект решения: —</PlaceholderText>
-      </div>
+      <WhatIfSlider />
+    </Section>
+  );
+}
+
+function ForecastSection() {
+  const scenario = useUIStore((s) => s.scenario);
+  const query = useForecast(scenario);
+  return (
+    <Section title="Прогноз" subtitle="4 недели">
+      <ForecastCard query={query} />
     </Section>
   );
 }
@@ -110,9 +116,7 @@ export default function Dashboard() {
       </Section>
       <ChainPanelSection />
       <WhatIfSection />
-      <Section title="Прогноз" subtitle="4 недели">
-        <SkeletonLine width="100%" />
-      </Section>
+      <ForecastSection />
       <Section title="Юнит-экономика" subtitle="маржа по SKU, %">
         <UnitEconTable />
       </Section>
