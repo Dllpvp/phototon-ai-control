@@ -50,8 +50,8 @@ export function DecisionForm() {
     try {
       const value: unknown = JSON.parse(params);
       if (typeof value !== "object" || value === null || Array.isArray(value) || Object.keys(value).length === 0 ||
-        Object.values(value).some((item) => typeof item !== "number" || !Number.isFinite(item))) {
-        throw new Error("Параметры должны быть непустым объектом чисел");
+        Object.values(value).some((item) => typeof item !== "number" && typeof item !== "string")) {
+        throw new Error("Параметры должны быть непустым объектом");
       }
       parsed = value as Record<string, number | string>;
     } catch {

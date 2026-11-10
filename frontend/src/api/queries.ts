@@ -13,6 +13,7 @@ import type {
   ForecastDTO,
   NotificationDTO,
   SliceDTO,
+  SimulationDTO,
   Snapshot,
   UnitEconDTO,
   WhatIfDTO,
@@ -131,14 +132,14 @@ export function useCreateDecision(): UseMutationResult<DecisionDTO, Error, Decis
 }
 
 export function useSimulate(): UseMutationResult<
-  DecisionDTO,
+  SimulationDTO,
   Error,
   { id: string; params: DecisionSimulateRequest }
 > {
   return useMutation({
     mutationKey: ["decisions", "simulate"],
     mutationFn: ({ id, params }) =>
-      postJson<DecisionDTO>(`/api/decisions/${encodeURIComponent(id)}/simulate`, params),
+      postJson<SimulationDTO>(`/api/decisions/${encodeURIComponent(id)}/simulate`, params),
   });
 }
 
