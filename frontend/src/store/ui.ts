@@ -15,10 +15,12 @@ interface UIState {
   as_of: string | null;
   selectedNodeId: string | null;
   sliceFilter: SliceFilter;
+  openDecisionForm: boolean;
   setScenario: (s: ScenarioId) => void;
   setAsOf: (d: string | null) => void;
   selectNode: (id: string | null) => void;
   setSliceFilter: (f: Partial<SliceFilter>) => void;
+  setOpenDecisionForm: (v: boolean) => void;
   reset: () => void;
 }
 
@@ -27,6 +29,7 @@ const INITIAL = {
   as_of: null,
   selectedNodeId: null,
   sliceFilter: { week: null, line: null, shift: null } as SliceFilter,
+  openDecisionForm: false,
 };
 
 export const useUIStore = create<UIState>()(
@@ -37,6 +40,7 @@ export const useUIStore = create<UIState>()(
       setAsOf: (as_of) => set({ as_of }),
       selectNode: (selectedNodeId) => set({ selectedNodeId }),
       setSliceFilter: (f) => set((s) => ({ sliceFilter: { ...s.sliceFilter, ...f } })),
+      setOpenDecisionForm: (v) => set({ openDecisionForm: v }),
       reset: () => set({ ...INITIAL }),
     }),
     {

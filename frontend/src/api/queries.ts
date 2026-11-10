@@ -11,6 +11,7 @@ import type {
   DecisionDTO,
   DecisionSimulateRequest,
   ForecastDTO,
+  NotificationDTO,
   SliceDTO,
   Snapshot,
   UnitEconDTO,
@@ -42,6 +43,7 @@ export const queryKeys = {
   forecast: (scenario: string) => ["forecast", scenario] as const,
   unitEcon: () => ["unit-econ"] as const,
   decisions: (scenario?: string) => ["decisions", scenario ?? null] as const,
+  notifications: () => ["notifications"] as const,
   decision: (id: string) => ["decision", id] as const,
   ai: () => ["ai"] as const,
 } as const;
@@ -111,6 +113,13 @@ export function useDecisions(scenario?: string): UseQueryResult<DecisionDTO[], E
     queryKey: queryKeys.decisions(scenario),
     queryFn: () =>
       getJson<DecisionDTO[]>(`/api/decisions${scenario ? qs({ scenario_id: scenario }) : ""}`),
+  });
+}
+
+export function useNotifications(): UseQueryResult<NotificationDTO[], Error> {
+  return useQuery({
+    queryKey: queryKeys.notifications(),
+    queryFn: () => getJson<NotificationDTO[]>("/api/notifications"),
   });
 }
 
