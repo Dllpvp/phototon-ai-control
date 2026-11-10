@@ -11,6 +11,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.api import router as api_router
 
@@ -30,17 +31,28 @@ def health_check():
     return {"ok": True, "version": "0.1.0", "status": "ok"}
 
 
-# 2. SPA-fallback: StaticFiles(html=True) не отдаёт index.html для /journal, /report,
-#    /decision/:id, /devkit без конечного слэша — вернёт 404. Catch-all до mount:
-#    api/* → JSON 404, остальное → index.html (история-роутинг, Telegram-диплинк §9.2).
-@app.get("/{full_path:path}", response_model=None)
-async def spa_fallback(full_path: str):
-    if full_path.startswith("api/"):
+# 2. SPA-fallback через exception_handler: StaticFiles(html=True) не отдаёт index.html
+#    для /journal, /report, /decision/:id, /devkit без конечного слэша — вернёт 404.
+#    Статику (/assets/*.js, /favicon.ico) НЕ перехватываем: отсутствующий файл с точкой
+#    в последнем сегменте должен вернуть 404 JSON, а не index.html.
+@app.exception_handler(StarletteHTTPException)
+async def spa_fallback(request, exc):
+    if exc.status_code != 404:
+        return JSONResponse(
+            status_code=exc.status_code, content={"detail": exc.detail}
+        )
+    path = request.url.path
+    if path.startswith("/api/"):
+        return JSONResponse(status_code=404, content={"detail": "Not Found"})
+    if request.method != "GET":
+        return JSONResponse(status_code=404, content={"detail": "Not Found"})
+    last_segment = path.rstrip("/").rsplit("/", 1)[-1]
+    if "." in last_segment:
         return JSONResponse(status_code=404, content={"detail": "Not Found"})
     return FileResponse(DIST / "index.html")
 
 
-# 3. Статика после роутера и catch-all — иначе /api/* перекроется.
+# 3. Статика после роутера — иначе /api/* перекроется.
 app.mount("/", StaticFiles(directory=str(DIST), html=True), name="static")
 
 
