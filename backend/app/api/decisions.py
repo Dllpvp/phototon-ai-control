@@ -16,7 +16,7 @@ from app.core.simulate import simulate as simulate_impact
 from app.db import DecisionStore
 from app.dependencies import get_db
 from app.integrations import telegram
-from app.schemas import DecisionDTO
+from app.schemas import DecisionDTO, SimulationDTO
 
 router = APIRouter(prefix="", tags=["decisions"])
 
@@ -82,12 +82,12 @@ async def get_decision(
     return decision
 
 
-@router.post("/decisions/{decision_id}/simulate", response_model=DecisionDTO)
+@router.post("/decisions/{decision_id}/simulate", response_model=SimulationDTO)
 async def simulate_decision(
     decision_id: str,
     payload: SimulateRequest | None = None,
     db: DecisionStore = Depends(get_db),
-) -> DecisionDTO:
+) -> SimulationDTO:
     """Запускает симуляцию для решения и обновляет его статус в БД."""
     decision = db.get_decision(decision_id)
     if decision is None:
@@ -115,7 +115,25 @@ async def simulate_decision(
         verdict=result.verdict,
     )
 
-    updated = db.get_decision(decision_id)
-    if updated is None:  # pragma: no cover — запись только что прочитана
-        raise HTTPException(status_code=404, detail="Решение не найдено")
-    return updated
+    # §9.2: final_snapshot — только числовые значения узлов (без служебного "status").
+    numeric_snapshot = {
+        node_id: {
+            key: value
+            for key, value in node_data.items()
+            if isinstance(value, (int, float)) and not isinstance(value, bool)
+        }
+        for node_id, node_data in result.final_snapshot.items()
+    }
+
+    return SimulationDTO(
+        days=result.days,
+        branch=result.branch,
+        effect_byn=result.effect_byn,
+        verdict=result.verdict,
+        recommendation=result.recommendation,
+        compensating_cause=result.compensating_cause,
+        loss_day=result.loss_day,
+        defect_rate=result.defect_rate,
+        downtime_h=result.downtime_h,
+        final_snapshot=numeric_snapshot,
+    )

@@ -60,5 +60,14 @@ async def test_decisions_simulate():
         })
     assert response.status_code == 200
     data = response.json()
-    assert "actual_effect_byn" in data
+    # Контракт §9.2: SimulationDTO (days, branch, effect_byn, verdict, loss_day,
+    # defect_rate, downtime_h, final_snapshot, ...)
+    assert data["days"] == 14
+    assert data["branch"] == "main"
+    assert "effect_byn" in data
     assert data["verdict"] in ["effective", "ineffective"]
+    assert "loss_day" in data
+    assert "defect_rate" in data
+    assert "downtime_h" in data
+    assert "final_snapshot" in data
+    assert isinstance(data["final_snapshot"], dict)
