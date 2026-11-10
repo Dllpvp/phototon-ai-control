@@ -84,7 +84,7 @@ export function LossCounter({ lossDay, startedAt }: LossCounterProps) {
         <span className="ml-1 text-2xl">BYN</span>
       </div>
       <div className="mono truncate text-xs" style={{ color: "var(--muted)" }}>
-        накопленные потери с начала смены
+        накопленные потери с начала недели 45 • 02.11.2026
       </div>
     </div>
   );

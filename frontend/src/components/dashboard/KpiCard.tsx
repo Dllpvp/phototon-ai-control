@@ -15,19 +15,15 @@ const STATUS_LABEL: Record<NodeStatus, string> = {
   green: "НОРМА",
 };
 
-/** Форматирует значение метрики по её единице измерения. */
+/** Форматирует числовое значение метрики БЕЗ единицы измерения — её рисуем отдельной строкой. */
 export function formatKpiValue(value: number, unit: string): string {
-  if (unit === "%") return formatPct(value);
-  if (unit === "BYN/сут") {
-    return `${formatByn(value)}/сут`;
+  if (unit === "%") return formatPct(value).replace(/%$/, "");
+  if (unit === "BYN/сут" || unit === "BYN/нед") {
+    return formatByn(value).replace(/\s*BYN$/, "");
   }
-  if (unit === "BYN/нед") {
-    return `${formatByn(value)}/нед`;
-  }
-  const n = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 1 })
+  return new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 1 })
     .format(value)
     .replace(/[\u00A0\u202F]/g, " ");
-  return unit ? `${n} ${unit}` : n;
 }
 
 interface KpiCardProps {
@@ -46,9 +42,17 @@ export function KpiCard({ kpi }: KpiCardProps) {
           {STATUS_LABEL[kpi.status]}
         </span>
       </div>
-      <p className="mono text-xl font-semibold truncate" style={{ color }}>
+      <p
+        className="mono text-xl font-semibold tabular-nums"
+        style={{ color, whiteSpace: "nowrap", fontSize: "clamp(0.875rem, 1.1vw, 1.25rem)" }}
+      >
         {formatKpiValue(kpi.value, kpi.unit)}
       </p>
+      {kpi.unit && (
+        <p className="mono text-xs" style={{ color: "var(--muted)" }}>
+          {kpi.unit}
+        </p>
+      )}
       {kpi.cost_per_day !== null && kpi.cost_per_day > 0 && (
         <p className="mono text-xs truncate" style={{ color: "var(--muted)" }}>
           {formatByn(kpi.cost_per_day)}/сут

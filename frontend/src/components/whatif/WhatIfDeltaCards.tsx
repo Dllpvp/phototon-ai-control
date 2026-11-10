@@ -4,6 +4,7 @@ import { formatByn } from "../../lib/format";
 
 interface WhatIfDeltaCardsProps {
   delta: WhatIfDeltaDTO;
+  isFact?: boolean;
 }
 
 function DeltaValue({ value, unit, invert }: { value: number; unit: string; invert?: boolean }) {
@@ -19,32 +20,35 @@ function DeltaValue({ value, unit, invert }: { value: number; unit: string; inve
   );
 }
 
-export function WhatIfDeltaCards({ delta }: WhatIfDeltaCardsProps) {
+export function WhatIfDeltaCards({ delta, isFact = false }: WhatIfDeltaCardsProps) {
+  const displayedDelta = isFact
+    ? { d_downtime: 0, d_sla: 0, d_revenue: 0, d_loss: 0 }
+    : delta;
   return (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
       <div className="card flex flex-col gap-0.5 p-2">
         <span className="mono text-[10px] uppercase" style={{ color: "var(--muted)" }}>
           простои, ч
         </span>
-        <DeltaValue value={delta.d_downtime} unit="ч" invert />
+        <DeltaValue value={displayedDelta.d_downtime} unit="ч" invert />
       </div>
       <div className="card flex flex-col gap-0.5 p-2">
         <span className="mono text-[10px] uppercase" style={{ color: "var(--muted)" }}>
           SLA-просв., зак.
         </span>
-        <DeltaValue value={delta.d_sla} unit="зак." invert />
+        <DeltaValue value={displayedDelta.d_sla} unit="зак." invert />
       </div>
       <div className="card flex flex-col gap-0.5 p-2">
         <span className="mono text-[10px] uppercase" style={{ color: "var(--muted)" }}>
           выручка, нед
         </span>
-        <DeltaValue value={delta.d_revenue} unit="BYN" />
+        <DeltaValue value={displayedDelta.d_revenue} unit="BYN" />
       </div>
       <div className="card flex flex-col gap-0.5 p-2">
         <span className="mono text-[10px] uppercase" style={{ color: "var(--muted)" }}>
           потери, сут
         </span>
-        <DeltaValue value={delta.d_loss} unit="BYN" invert />
+        <DeltaValue value={displayedDelta.d_loss} unit="BYN" invert />
       </div>
     </div>
   );

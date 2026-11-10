@@ -102,7 +102,12 @@ export function WhatIfSlider({ onAccept }: WhatIfSliderProps) {
         <span>6</span>
       </div>
 
-      {current && <WhatIfDeltaCards delta={current.vs_now} />}
+      {current && (
+        <WhatIfDeltaCards
+          delta={current.vs_now}
+          isFact={ops === 4}
+        />
+      )}
 
       {tableRows.length === OPS_VALUES.length && (
         <WhatIfTable rows={tableRows} currentOps={debouncedOps} />
