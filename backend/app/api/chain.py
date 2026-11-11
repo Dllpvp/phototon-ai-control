@@ -6,11 +6,12 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Path, Query
+from fastapi import APIRouter, Depends, Path, Query, Request
 
 from app.core.loader import GraphPayload, GraphNodePayload, ScenarioNode, load_scenario
 from app.dependencies import get_graph
 from app.schemas import ChainDTO, ChainNodeDTO
+from app.security.rbac import get_allowed_domains, get_dept, get_role, hide_chain_nodes
 
 router = APIRouter(tags=["chain"])
 
@@ -45,6 +46,7 @@ async def get_chain(
     node_id: str = Path(..., description="ID узла (например, fin_margin)"),
     scenario: str = Query("main", description="ID сценария: main|neg|peak"),
     graph: GraphPayload = Depends(get_graph),
+    request: Request = None,
 ) -> ChainDTO:
     """Цепочка drill-down от узла до корневой причины.
     
@@ -71,7 +73,8 @@ async def get_chain(
         # Фильтруем None
         chain_nodes = [n for n in chain_nodes if n is not None]
         
-        return ChainDTO(source="hint", chain=chain_nodes)
+        allowed = get_allowed_domains(get_role(request), get_dept(request))
+        return ChainDTO(source="hint", chain=hide_chain_nodes(chain_nodes, allowed))
     
     # Фолбэк: алгоритмический поиск пути к корневой причине
     # Ищем путь от node_id до любого из root_causes
@@ -109,4 +112,5 @@ async def get_chain(
     
     chain_nodes = [n for n in chain_nodes if n is not None]
     
-    return ChainDTO(source="algorithm", chain=chain_nodes)
+    allowed = get_allowed_domains(get_role(request), get_dept(request))
+    return ChainDTO(source="algorithm", chain=hide_chain_nodes(chain_nodes, allowed))

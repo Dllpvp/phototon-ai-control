@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from app.core.anchors import ANCHORS
@@ -17,6 +17,7 @@ from app.db import DecisionStore
 from app.dependencies import get_db
 from app.integrations import telegram
 from app.schemas import DecisionDTO, SimulationDTO
+from app.security.rbac import check_decision_permission, get_dept, get_role
 
 router = APIRouter(prefix="", tags=["decisions"])
 
@@ -39,8 +40,16 @@ def _branch_for(decision: DecisionDTO, payload: SimulateRequest | None) -> str:
 async def create_decision(
     decision: DecisionDTO,
     db: DecisionStore = Depends(get_db),
+    request: Request = None,
 ) -> DecisionDTO:
     """Создаёт решение: сохраняет в БД, генерит Jira-ключ, шлёт Telegram."""
+    # 0. RBAC: роль из демо-заголовка X-Demo-Role (§22.3, без настоящего auth)
+    check_decision_permission(
+        role=get_role(request),
+        decision_type=decision.type,
+        dept=get_dept(request),
+    )
+
     # 1. Jira-ключ (счётчик PROD-{n} в SQLite, §11.2)
     decision.jira_key = db.next_jira_key("PROD")
 

@@ -175,9 +175,9 @@ class ChainNodeDTO(BaseModel):
     node_id: str
     name: str
     domain: str
-    value: float
+    value: float | None  # None для скрытых доменов
     unit: str
-    status: Literal["red", "yellow", "green"]
+    status: Literal["red", "yellow", "green", "hidden"]
     cost_per_day: float | None = None
     delta_from_parent: float | None = None  # изменение относительно родителя
 
