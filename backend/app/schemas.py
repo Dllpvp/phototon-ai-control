@@ -338,3 +338,32 @@ class MigrationRunDTO(BaseModel):
     sources_count: int
     pii_sources: int
     steps: list[MigrationStepDTO]
+
+
+# ──────────────────────────────────────────────────────────────────────
+# T22: ИИ-монитор и инциденты — additive
+# ──────────────────────────────────────────────────────────────────────
+
+class IncidentDTO(BaseModel):
+    """Инцидент от монитора. Рекомендация — черновик, решение оформляет человек."""
+    id: str
+    cause_key: str
+    node_id: str
+    title: str
+    value: float
+    unit: str
+    root_cause: str
+    recommendation: str
+    status: Literal["open", "acknowledged", "resolved"]
+    resolution: Literal["accepted", "rejected"] | None = None
+    created_at: datetime
+    updated_at: datetime | None = None
+
+
+class MonitorCheckResultDTO(BaseModel):
+    """Ответ POST /api/monitor/check: сколько создано, сколько отклонено как дубли."""
+    created: int
+    duplicated: int
+    open_total: int
+    incidents: list[IncidentDTO]
+
