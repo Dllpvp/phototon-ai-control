@@ -1,0 +1,237 @@
+{
+  "version": "2.2",
+  "note": "T18: каталог KPI. 33 = 23 базовых (узлы графа v1+v2) + 10 лекционных карт v2.2. Значения node-карт резолвятся из графа, не хранятся здесь. FRT: норма 15 мин по ANCHORS_V2 (в §22.4 опечатка 4.5).",
+  "items": [
+    {
+      "id": "fin_margin", "name": "Маржинальность", "department": "executive", "unit": "%",
+      "norm": {"lo": 35, "hi": 40, "unit": "%"},
+      "value_kind": "node", "node_id": "fin_margin",
+      "formula": "(выручка − полная себестоимость) / выручка × 100; факт — ANCHORS v1",
+      "formula_status": "confirmed", "origin": "v1", "source_system": "1С Финансы"
+    },
+    {
+      "id": "fin_loss_day", "name": "Потери в сутки", "department": "executive", "unit": "BYN/сут",
+      "norm": {"lo": 0, "hi": 300, "unit": "BYN/сут"},
+      "value_kind": "node", "node_id": "fin_loss_day",
+      "formula": "простой_ч × 131 BYN/ч (COST_PER_DOWNTIME_H), калибровано по ANCHORS",
+      "formula_status": "confirmed", "origin": "v1", "source_system": "ERP + 1С"
+    },
+    {
+      "id": "fin_revenue_week", "name": "Выручка за неделю", "department": "finance", "unit": "BYN/нед",
+      "norm": {"lo": 45000, "hi": null, "unit": "BYN/нед"},
+      "value_kind": "node", "node_id": "fin_revenue_week",
+      "formula": "Σ оплаченных заказов за неделю",
+      "formula_status": "confirmed", "origin": "v1", "source_system": "1С Финансы"
+    },
+    {
+      "id": "sales_sla_breach", "name": "Срывы сроков", "department": "clients", "unit": "зак/сут",
+      "norm": {"lo": 0, "hi": 5, "unit": "зак/сут"},
+      "value_kind": "node", "node_id": "sales_sla_breach",
+      "formula": "count(заказы с отгрузкой позже SLA 72 ч) за сутки",
+      "formula_status": "confirmed", "origin": "v1", "source_system": "ERP"
+    },
+    {
+      "id": "sales_b2b_orders", "name": "B2B-заказы", "department": "clients", "unit": "зак/сут",
+      "norm": {"lo": 55, "hi": null, "unit": "зак/сут"},
+      "value_kind": "node", "node_id": "sales_b2b_orders",
+      "formula": "count(принятых B2B-заказов) за сутки",
+      "formula_status": "confirmed", "origin": "v1", "source_system": "ERP"
+    },
+    {
+      "id": "sales_b2c_churn_risk", "name": "Риск оттока B2C", "department": "clients", "unit": "%",
+      "norm": {"lo": 0, "hi": 10, "unit": "%"},
+      "value_kind": "node", "node_id": "sales_b2c_churn_risk",
+      "formula": "доля B2C-клиентов без повторного заказа 90 дней (модель оттока)",
+      "formula_status": "assumption", "origin": "v1", "source_system": "picPac App"
+    },
+    {
+      "id": "sales_client7_margin", "name": "Маржа клиента [CLIENT_B2B_14]", "department": "clients", "unit": "%",
+      "norm": {"lo": 15, "hi": 30, "unit": "%"},
+      "value_kind": "node", "node_id": "sales_client7_margin",
+      "formula": "(выручка клиента − себестоимость с перепечатками) / выручка × 100",
+      "formula_status": "confirmed", "origin": "v1", "source_system": "1С + ERP"
+    },
+    {
+      "id": "prod_downtime_l2", "name": "Простой линии склейки Layflat (Kolbus №2)", "department": "production", "unit": "ч/сут",
+      "norm": {"lo": 0, "hi": 4, "unit": "ч/сут"},
+      "value_kind": "node", "node_id": "prod_downtime_l2",
+      "formula": "Σ часов простоя линии L2 за сутки (MES/штрихкодирование)",
+      "formula_status": "confirmed", "origin": "v1", "source_system": "ERP/MES"
+    },
+    {
+      "id": "quality_defect_rate", "name": "Брак", "department": "production", "unit": "%",
+      "norm": {"lo": 2, "hi": 5, "unit": "%"},
+      "value_kind": "node", "node_id": "quality_defect_rate",
+      "formula": "бракованные изделия / всего изделий × 100 (ОТК)",
+      "formula_status": "confirmed", "origin": "v1", "source_system": "ОТК"
+    },
+    {
+      "id": "hr_operators_s3", "name": "Операторы склейки, смена №3 (22:00–06:00)", "department": "hr", "unit": "чел",
+      "norm": {"lo": 6, "hi": 7, "unit": "чел"},
+      "value_kind": "node", "node_id": "hr_operators_s3",
+      "formula": "count(операторов склейки в смене №3) по табелю",
+      "formula_status": "confirmed", "origin": "v1", "source_system": "HR-модуль"
+    },
+    {
+      "id": "hr_overtime_s3", "name": "Переработки смены №3", "department": "hr", "unit": "ч/сут",
+      "norm": {"lo": 0, "hi": 6, "unit": "ч/сут"},
+      "value_kind": "node", "node_id": "hr_overtime_s3",
+      "formula": "Σ переработок смены №3 за сутки (табель)",
+      "formula_status": "confirmed", "origin": "v1", "source_system": "HR-модуль"
+    },
+    {
+      "id": "hr_turnover", "name": "Текучесть кадров", "department": "hr", "unit": "%/год",
+      "norm": {"lo": 0, "hi": 15, "unit": "%/год"},
+      "value_kind": "node", "node_id": "hr_turnover",
+      "formula": "уволившиеся за 12 мес / среднесписочная численность × 100",
+      "formula_status": "confirmed", "origin": "v1", "source_system": "HR-модуль"
+    },
+    {
+      "id": "sales_claims_day", "name": "Рекламации в CRM", "department": "clients", "unit": "шт/сут",
+      "norm": {"lo": 0, "hi": 8, "unit": "шт/сут"},
+      "value_kind": "node", "node_id": "sales_claims_day",
+      "formula": "count(тикеты-рекламации в Мэри) за сутки",
+      "formula_status": "confirmed", "origin": "v2", "source_system": "Мэри"
+    },
+    {
+      "id": "sales_frt_min", "name": "Время первого ответа (FRT)", "department": "clients", "unit": "мин",
+      "norm": {"lo": 0, "hi": 15, "unit": "мин"},
+      "value_kind": "node", "node_id": "sales_frt_min",
+      "formula": "avg(время первого ответа на тикет), мин; норма ≤15 (ANCHORS_V2)",
+      "formula_status": "confirmed", "origin": "v2", "source_system": "Мэри"
+    },
+    {
+      "id": "sales_repeat_b2b", "name": "Повторные заказы B2B", "department": "clients", "unit": "%",
+      "norm": {"lo": 50, "hi": null, "unit": "%"},
+      "value_kind": "node", "node_id": "sales_repeat_b2b",
+      "formula": "доля B2B-клиентов с повторным заказом за период × 100",
+      "formula_status": "confirmed", "origin": "v2", "source_system": "ERP + CRM"
+    },
+    {
+      "id": "hr_interns_share_s3", "name": "Доля стажёров аутстаффинга, смена №3", "department": "hr", "unit": "%",
+      "norm": {"lo": 0, "hi": 35, "unit": "%"},
+      "value_kind": "node", "node_id": "hr_interns_share_s3",
+      "formula": "стажёры аутстаффинга / все операторы смены №3 × 100",
+      "formula_status": "confirmed", "origin": "v2", "source_system": "HR-модуль"
+    },
+    {
+      "id": "prod_cycle_h", "name": "Средний цикл оплаты→отгрузка", "department": "production", "unit": "ч",
+      "norm": {"lo": 0, "hi": 22.87, "unit": "ч"},
+      "value_kind": "node", "node_id": "prod_cycle_h",
+      "formula": "avg(ts_отгрузки − ts_оплаты) по заказам; норматив 22 ч 52 мин",
+      "formula_status": "confirmed", "origin": "v2", "source_system": "ERP/MES"
+    },
+    {
+      "id": "log_ontime_pct", "name": "On-time отгрузка", "department": "logistics", "unit": "%",
+      "norm": {"lo": 95, "hi": null, "unit": "%"},
+      "value_kind": "node", "node_id": "log_ontime_pct",
+      "formula": "отгрузки в обещанный срок / все отгрузки × 100",
+      "formula_status": "confirmed", "origin": "v2", "source_system": "Логистика RU/BY"
+    },
+    {
+      "id": "log_redelivery_cost_day", "name": "Повторная доставка", "department": "logistics", "unit": "BYN/сут",
+      "norm": {"lo": 0, "hi": 40, "unit": "BYN/сут"},
+      "value_kind": "node", "node_id": "log_redelivery_cost_day",
+      "formula": "count(повторных доставок) × 10 BYN (тариф EMS B2B)",
+      "formula_status": "confirmed", "origin": "v2", "source_system": "Логистика BY"
+    },
+    {
+      "id": "acc_defect_cost_day", "name": "Себестоимость брака + пересылки", "department": "accounting", "unit": "BYN/сут",
+      "norm": {"lo": 0, "hi": 150, "unit": "BYN/сут"},
+      "value_kind": "node", "node_id": "acc_defect_cost_day",
+      "formula": "REPRINT_COST 510 + пересылка 140 = 650; декомпозиция fin_loss_day, не суммировать",
+      "formula_status": "confirmed", "origin": "v2", "source_system": "1С Бухгалтерия"
+    },
+    {
+      "id": "acc_refunds_day", "name": "Компенсации / возвраты", "department": "accounting", "unit": "BYN/сут",
+      "norm": {"lo": 0, "hi": 30, "unit": "BYN/сут"},
+      "value_kind": "node", "node_id": "acc_refunds_day",
+      "formula": "Σ компенсаций и возвратов за сутки",
+      "formula_status": "confirmed", "origin": "v2", "source_system": "1С Бухгалтерия"
+    },
+    {
+      "id": "adm_overdue", "name": "Просроченные поручения", "department": "admin", "unit": "шт",
+      "norm": {"lo": 0, "hi": 0, "unit": "шт"},
+      "value_kind": "node", "node_id": "adm_overdue",
+      "formula": "count(поручения с due < сегодня и не закрыты)",
+      "formula_status": "confirmed", "origin": "v2", "source_system": "Таск-система"
+    },
+    {
+      "id": "proc_paper_stock_days", "name": "Запас бумаги 450 г/м²", "department": "procurement", "unit": "дней",
+      "norm": {"lo": 14, "hi": null, "unit": "дней"},
+      "value_kind": "node", "node_id": "proc_paper_stock_days",
+      "formula": "остаток бумаги 450 г/м² / среднесуточный расход",
+      "formula_status": "confirmed", "origin": "v2", "source_system": "1С Закупки"
+    },
+    {
+      "id": "prod_reprint_volume", "name": "Повторные тиражи", "department": "production", "unit": "тираж/сут",
+      "norm": {"lo": 0, "hi": 3, "unit": "тираж/сут"},
+      "value_kind": "node", "node_id": "prod_reprint_volume",
+      "formula": "count(повторных тиражей из-за брака) за сутки",
+      "formula_status": "confirmed", "origin": "v1", "source_system": "ОТК → ERP"
+    },
+    {
+      "id": "fin_ondemand_margin", "name": "Маржа онлайн-заказов", "department": "finance", "unit": "%",
+      "norm": {"lo": 35, "hi": 45, "unit": "%"},
+      "value_kind": "node", "node_id": "fin_ondemand_margin",
+      "formula": "(выручка онлайн − себестоимость) / выручка × 100 (picPac)",
+      "formula_status": "confirmed", "origin": "v1", "source_system": "picPac App + 1С"
+    },
+    {
+      "id": "exec_cross_alerts", "name": "Cross-department alerts", "department": "executive", "unit": "шт",
+      "norm": {"lo": 0, "hi": 2, "unit": "шт"},
+      "value_kind": "catalog", "demo_value": 5,
+      "formula": "count(красных связок между отделами по рёбрам графа); правило подсчёта — допущение",
+      "formula_status": "assumption", "origin": "lecture_v22", "source_system": "Граф причин (внутр.)"
+    },
+    {
+      "id": "exec_effect_14d", "name": "Эффект решений за 14 дней", "department": "executive", "unit": "BYN",
+      "norm": {"lo": 0, "hi": null, "unit": "BYN"},
+      "value_kind": "anchor", "anchor_key": "test_effect_14d",
+      "formula": "(потери_до − потери_после) × 14 = (1840 − 260) × 14",
+      "formula_status": "confirmed", "origin": "lecture_v22", "source_system": "Журнал решений"
+    },
+    {
+      "id": "clients_answer_1min_pct", "name": "Ответ за 1 минуту", "department": "clients", "unit": "%",
+      "norm": {"lo": 70, "hi": null, "unit": "%"},
+      "value_kind": "catalog", "demo_value": 38,
+      "formula": "тикеты с первым ответом ≤ 1 мин / все тикеты × 100",
+      "formula_status": "assumption", "origin": "lecture_v22", "source_system": "Мэри"
+    },
+    {
+      "id": "clients_bot_share_pct", "name": "Доля закрытых ботом", "department": "clients", "unit": "%",
+      "norm": {"lo": 80, "hi": null, "unit": "%"},
+      "value_kind": "catalog", "demo_value": 45,
+      "formula": "диалоги, закрытые ботом без оператора / все диалоги × 100 (цель 80)",
+      "formula_status": "assumption", "origin": "lecture_v22", "source_system": "Мэри"
+    },
+    {
+      "id": "clients_nezabory_pvz", "name": "Незаборы ПВЗ", "department": "clients", "unit": "шт/сут",
+      "norm": {"lo": 0, "hi": 5, "unit": "шт/сут"},
+      "value_kind": "catalog", "demo_value": 18,
+      "formula": "count(заказы, не забранные из ПВЗ до конца срока хранения) за сутки",
+      "formula_status": "assumption", "origin": "lecture_v22", "source_system": "Логистика RU"
+    },
+    {
+      "id": "hr_satisfaction", "name": "Удовлетворённость системой", "department": "hr", "unit": "/10",
+      "norm": {"lo": 7, "hi": 10, "unit": "/10"},
+      "value_kind": "catalog", "demo_value": 7.8,
+      "formula": "средняя оценка сотрудников по опросу 1–10; методика — допущение",
+      "formula_status": "assumption", "origin": "lecture_v22", "source_system": "HR-опрос"
+    },
+    {
+      "id": "proc_supply_risk_pct", "name": "Риск срыва поставки к пику", "department": "procurement", "unit": "%",
+      "norm": {"lo": 0, "hi": 20, "unit": "%"},
+      "value_kind": "catalog", "demo_value": 62,
+      "formula": "P(поставка позже пика) = f(запас 6 дн, lead time 12 дн, пик нед. 47); модель — допущение",
+      "formula_status": "assumption", "origin": "lecture_v22", "source_system": "1С Закупки"
+    },
+    {
+      "id": "retail_abandoned_designs", "name": "Брошенные макеты", "department": "retail", "unit": "шт/сут",
+      "norm": {"lo": 0, "hi": 50, "unit": "шт/сут"},
+      "value_kind": "catalog", "demo_value": 120,
+      "formula": "count(макеты сохранены, но не оплачены) за сутки",
+      "formula_status": "assumption", "origin": "lecture_v22", "source_system": "picPac App"
+    }
+  ]
+}

@@ -269,3 +269,36 @@ class NotificationDTO(BaseModel):
 
 
 DecisionDTO.model_rebuild()
+
+# ──────────────────────────────────────────────────────────────────────
+# T18: Каталог KPI (PLAN-V2 §22.4, §22.10) — additive, v1 DTO не менять
+# ──────────────────────────────────────────────────────────────────────
+
+class MetricCatalogItemDTO(BaseModel):
+    """Карточка KPI из каталога 33 (T18).
+
+    value резолвится на запросе: node → граф, anchor → ANCHORS v1,
+    catalog → демо-значение лекции v2.2 (единственный источник — kpi_catalog.json).
+    formula_status="assumption" — формула не подтверждена заказчиком («допущение»).
+    """
+    id: str
+    name: str
+    department: str
+    unit: str
+    norm: Norm | None = None
+    value: float | None = None            # None: узел v2 ещё не смержен в граф
+    available: bool = True                # False → UI показывает «—»
+    value_kind: Literal["node", "anchor", "catalog"]
+    node_id: str | None = None
+    anchor_key: str | None = None
+    formula: str
+    formula_status: Literal["confirmed", "assumption"]
+    origin: Literal["v1", "v2", "lecture_v22"]
+    source_system: str
+
+
+class MetricCatalogDTO(BaseModel):
+    """Ответ GET /api/metrics/catalog?department= (T18)."""
+    total: int
+    department: str | None = None
+    items: list[MetricCatalogItemDTO]
