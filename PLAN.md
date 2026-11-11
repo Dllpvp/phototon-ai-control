@@ -154,9 +154,42 @@
   НЕ ДЕЛАТЬ: любые новые фичи после этой задачи. **CODE FREEZE.**
   КОММИТ: chore: demo polish + pitch + backup (stage 8, CODE FREEZE)
 
-### ЭТАП 9 — Демо-дни (11–13.11, кода нет)
+### ЭТАП 9 — v2 (дельта после лекций 11.11)
+- [ ] **T9 Security** (§6 PLAN-V2: masking, rbac, sanitize, audit, ollama, тесты, RoleSwitcher, аудит-модалка)  
+  ФАЙЛЫ: backend/app/security/{__init__,masking,rbac,sanitize,audit}.py; backend/app/integrations/ai_provider.py (правка); backend/tests/{test_masking,test_rbac,test_sanitize}.py; frontend/src/components/layout/RoleSwitcher.tsx; frontend/src/components/security/SecurityAuditModal.tsx.  
+  ПРИЁМКА: test_masking/rbac/sanitize зелёные; Network чист; свитчер live.  
+  НЕ ДЕЛАТЬ: T10–T14.
+
+- [ ] **T10 Ребрендинг** (§3 PLAN-V2: dictionaries, display-имена, dims, сезонность-комментарий, norms)  
+  ФАЙЛЫ: backend/app/core/dictionaries.py; backend/app/data/scenarios/{main,neg,peak}.json (правка display); backend/data/seasonality.json (комментарий).  
+  ПРИЁМКА: тесты v1 зелёные; Kolbus/Layflat/picPac/22:52 на экране.  
+  НЕ ДЕЛАТЬ: математику, id узлов.
+
+- [ ] **T11 Gateway+Экосистема** (§7 PLAN-V2: ingest, mapping, эмулятор, bitrix-эмуляция, status, digest, вкладка UI)  
+  ФАЙЛЫ: backend/app/api/gateway.py; backend/app/core/ingest.py; backend/app/integrations/bitrix.py; backend/app/data/emulator.py; frontend/src/pages/EcosystemPage.tsx.  
+  ПРИЁМКА: test_gateway; burst→алерт offline; 8 коннекторов.  
+  НЕ ДЕЛАТЬ: реальные вызовы 1С/Битрикс.
+
+- [ ] **T12 Паспорт+Клиент360** (§9–10 PLAN-V2: фикстуры, endpoints, drawers)  
+  ФАЙЛЫ: backend/app/data/passports.py; backend/app/api/orders.py; backend/app/api/clients.py; frontend/src/components/orders/OrderTimeline.tsx; frontend/src/components/clients/Client360Drawer.tsx.  
+  ПРИЁМКА: test_passport/client360; таймлайн с отклонениями.  
+  НЕ ДЕЛАТЬ: T13–T14.
+
+- [ ] **T13 Прогноз+Поручения+Digest** (§11–12 PLAN-V2: горизонт, закупки, summary, digest-отправка)  
+  ФАЙЛЫ: backend/app/api/forecast.py (правка); backend/app/api/decisions.py (правка); backend/app/api/export.py; frontend/src/components/forecast/ForecastHorizon.tsx; frontend/src/components/decision/ExecutionStrip.tsx.  
+  ПРИЁМКА: test_forecast_v2/execution/digest.  
+  НЕ ДЕЛАТЬ: T14.
+
+- [ ] **T14 Питч+полировка** (§16 PLAN-V2: script/slides/coverage, backup-видео, UX-аудит §13, MCP-скелет §8 если время)  
+  ФАЙЛЫ: pitch/{script,slides,coverage}.md; pitch/backup-demo-v2.mp4; docs/demo-checklist.md; backend/app/mcp_server.py (скелет).  
+  ПРИЁМКА: демо ≤3:00 ×3 прогона; DoD v2 весь.  
+  НЕ ДЕЛАТЬ: новые фичи после DoD.
+
+  **GATE G5 (конец Этапа 9):** pytest ≥82 passed; build зелёный; демо ≤3:00; DoD v2 (§15 PLAN-V2) полностью.
+
+### ЭТАП 10 — Демо-дни (12–13.11, кода нет)
 - [ ] **E1 · Площадка:** раскатка на venue-железе; HDMI/USB-C адаптеры; решение по OFFLINE_MODE по факту сети; 3 репетиции на месте; флешки ×2 с backup-видео и .zip; ноут-дубль.
-- [ ] **E2 · Защита:** питч по script.md (3:40); ответы на вопросы жюри: «данные синтетика?» → «калибровка по публичным профилям CEWE/Shutterfly + адаптер под реальные данные (§2.3)»; «одна ли математика?» → «одна модель и одна константа 131 BYN/ч; ползунок — калибровочная кривая из 3 точек, согласована тестом».
+- [ ] **E2 · Защита:** питч по script.md (3:00); ответы на вопросы жюри: «данные синтетика?» → «калибровка по публичным профилям CEWE/Shutterfly + адаптер под реальные данные (§2.3)»; «одна ли математика?» → «одна модель и одна константа 131 BYN/ч; ползунок — калибровочная кривая из 3 точек, согласована тестом».
 
 ## 4. Гейты (контрольные точки)
 | Гейт | После | Условие прохождения |
