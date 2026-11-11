@@ -17,6 +17,8 @@ from app.api import (
     whatif,
     ai,
     report,
+    metrics,
+    migration,
 )
 
 router = APIRouter(prefix="/api")
@@ -32,3 +34,5 @@ router.include_router(decisions.router)
 router.include_router(jira_mock.router)
 router.include_router(ai.router)
 router.include_router(report.router)
+router.include_router(metrics.router)
+router.include_router(migration.router)

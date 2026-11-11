@@ -269,3 +269,72 @@ class NotificationDTO(BaseModel):
 
 
 DecisionDTO.model_rebuild()
+
+# ──────────────────────────────────────────────────────────────────────
+# T18: Каталог KPI (PLAN-V2 §22.4, §22.10) — additive, v1 DTO не менять
+# ──────────────────────────────────────────────────────────────────────
+
+class MetricCatalogItemDTO(BaseModel):
+    """Карточка KPI из каталога 33 (T18).
+
+    value резолвится на запросе: node → граф, anchor → ANCHORS v1,
+    catalog → демо-значение лекции v2.2 (единственный источник — kpi_catalog.json).
+    formula_status="assumption" — формула не подтверждена заказчиком («допущение»).
+    """
+    id: str
+    name: str
+    department: str
+    unit: str
+    norm: Norm | None = None
+    value: float | None = None            # None: узел v2 ещё не смержен в граф
+    available: bool = True                # False → UI показывает «—»
+    value_kind: Literal["node", "anchor", "catalog"]
+    node_id: str | None = None
+    anchor_key: str | None = None
+    formula: str
+    formula_status: Literal["confirmed", "assumption"]
+    origin: Literal["v1", "v2", "lecture_v22"]
+    source_system: str
+
+
+class MetricCatalogDTO(BaseModel):
+    """Ответ GET /api/metrics/catalog?department= (T18)."""
+    total: int
+    department: str | None = None
+    items: list[MetricCatalogItemDTO]
+
+# ──────────────────────────────────────────────────────────────────────
+# T20: Migration Layer (PLAN-V2 §22.6, §22.10) — additive
+# ──────────────────────────────────────────────────────────────────────
+
+class MigrationSourceDTO(BaseModel):
+    """Источник данных для миграции. Реальный перенос — после доступов, сейчас контракт."""
+    system: str
+    name: str
+    department: str
+    objects: list[str]
+    access_mode: Literal["read_api", "export", "webhook", "manual_csv"]
+    pii_level: Literal["none", "personal", "commercial"]
+    migration_status: Literal["contract_ready", "emulator", "pending_access"]
+    notes: str | None = None
+
+
+class MigrationStepDTO(BaseModel):
+    """Шаг демо-миграции. mode=real — шаг делает настоящую работу, emulator — заглушка."""
+    n: int
+    key: str
+    title: str
+    status: Literal["completed", "failed", "skipped"]
+    detail: str
+    mode: Literal["real", "emulator"] = "emulator"
+
+
+class MigrationRunDTO(BaseModel):
+    """Ответ POST /api/migration/demo-run. Записывается в таблицу migration_runs."""
+    run_id: str
+    status: Literal["completed", "failed"]
+    mode: Literal["emulator"] = "emulator"
+    created_at: datetime
+    sources_count: int
+    pii_sources: int
+    steps: list[MigrationStepDTO]
