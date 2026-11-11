@@ -22,3 +22,6 @@ backend/state.db
 
 # Python bytecode
 __pycache__/
+*.pyc
+ProVidedText_lec1.md
+temp-readme2.md
