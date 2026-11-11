@@ -1,0 +1,55 @@
+/* Тема fotoprint — токены из root index.html (провенанс: docs/design/fotoprint-source.html).
+   Контракт имён — как у 4 тем в theme.css. Обе палитры есть в источнике (light + dark). */
+
+/* Уровень 1: шрифты/радиус/тень */
+[data-theme="fotoprint"] {
+  --font-display: "Plus Jakarta Sans", system-ui, sans-serif; /* источник Onest → замена из @fontsource */
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;      /* derived: в источнике нет mono */
+  --font-serif: "Instrument Serif", Georgia, serif;           /* derived: в источнике нет serif */
+  --radius: 28px;                                             /* .c / .sc border-radius */
+  --shadow-strength: 2;                                       /* derived: мягкие тени, паттерн zen */
+}
+
+/* Уровень 2: light (базовая палитра источника) */
+[data-theme="fotoprint"][data-mode="light"] {
+  --bg: #f6f3ec;                          /* :root --bg */
+  --panel: rgba(255, 255, 255, 0.76);     /* --card */
+  --panel-2: #ece6d8;                     /* --bar */
+  --hair: rgba(60, 45, 10, 0.09);         /* --line */
+  --hair-strong: rgba(60, 45, 10, 0.1);   /* --rim2 */
+  --text: #1b1813;                        /* --ink */
+  --muted: #80796b;                       /* --mut */
+  --alert: #e5484d;                       /* --red */
+  --alert-soft: rgba(229, 72, 77, 0.1);   /* derived: --alert 10% */
+  --warn: #f5b301;                        /* --yel */
+  --warn-soft: rgba(245, 179, 1, 0.12);   /* derived: --warn 12% */
+  --ok: #2da66b;                          /* --grn */
+  --ok-soft: rgba(45, 166, 107, 0.1);     /* derived: --ok 10% */
+  --accent: #1b1813;                      /* --act (primary) */
+  --accent-2: #2da66b;                    /* derived: вторичный = --ok, паттерн swiss/zen */
+  --paper: rgba(255, 255, 255, 0.95);     /* --cardb */
+  --paper-ink: #1b1813;                   /* --ink */
+  --shadow: rgba(120, 90, 20, 0.09);      /* --sh */
+}
+
+/* Уровень 2: dark (вторая палитра источника) */
+[data-theme="fotoprint"][data-mode="dark"] {
+  --bg: #0e0d0a;                          /* --bg dark */
+  --panel: rgba(36, 33, 26, 0.74);        /* --card dark */
+  --panel-2: #2f2b22;                     /* --bar dark */
+  --hair: rgba(255, 255, 255, 0.09);      /* --line dark */
+  --hair-strong: rgba(255, 255, 255, 0.22); /* --rim dark */
+  --text: #f4f0e6;                        /* --ink dark */
+  --muted: #a39d8e;                       /* --mut dark */
+  --alert: #f0616a;                       /* --red dark */
+  --alert-soft: rgba(240, 97, 106, 0.15); /* derived: --alert dark 15% */
+  --warn: #f5b301;                        /* --yel в dark источника не переопределён */
+  --warn-soft: rgba(245, 179, 1, 0.15);   /* derived: --warn 15% */
+  --ok: #3dbb7e;                          /* --grn dark */
+  --ok-soft: rgba(61, 187, 126, 0.15);    /* derived: --ok dark 15% */
+  --accent: #f4f0e6;                      /* derived: --act dark нечитаем как текст → --ink, паттерн zen dark */
+  --accent-2: #3dbb7e;                    /* derived: = --ok dark */
+  --paper: rgba(36, 33, 26, 0.95);        /* derived: --card dark + непрозрачность */
+  --paper-ink: #f4f0e6;                   /* --ink dark */
+  --shadow: rgba(0, 0, 0, 0.4);           /* --sh dark */
+}
