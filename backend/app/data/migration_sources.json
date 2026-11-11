@@ -1,0 +1,54 @@
+{
+  "version": "2.2",
+  "note": "T20: карта источников миграции (PLAN-V2 §22.6). Реальный перенос — после получения доступов; сейчас контракт + эмуляция.",
+  "sources": [
+    {
+      "system": "mary", "name": "Мэри (CRM поддержки)", "department": "clients",
+      "objects": ["tickets", "sla", "tags", "frt", "bot_share"],
+      "access_mode": "read_api", "pii_level": "personal", "migration_status": "contract_ready",
+      "notes": "Тикеты и SLA; сырые тексты в LLM не передаются — только теги после санитизации."
+    },
+    {
+      "system": "erp", "name": "ERP (1С Производство)", "department": "production",
+      "objects": ["orders", "stages", "barcodes", "machines"],
+      "access_mode": "export", "pii_level": "commercial", "migration_status": "contract_ready",
+      "notes": "OData/HTTP-выгрузки; штрихкодирование стадий, паспорт заказа."
+    },
+    {
+      "system": "bitrix", "name": "Битрикс24", "department": "clients",
+      "objects": ["clients", "deals", "tasks"],
+      "access_mode": "read_api", "pii_level": "personal", "migration_status": "pending_access",
+      "notes": "Доступ не подтверждён заказчиком. Контракт REST готов: tasks.task.add, im.message.add, crm.timeline.comment.add."
+    },
+    {
+      "system": "hr_module", "name": "HR-модуль", "department": "hr",
+      "objects": ["shifts", "interns", "overtime", "quotas"],
+      "access_mode": "export", "pii_level": "personal", "migration_status": "contract_ready",
+      "notes": "Персональные и медицинские данные (адаптированные квоты) — маскирование обязательно."
+    },
+    {
+      "system": "one_c_acc", "name": "1С Бухгалтерия", "department": "accounting",
+      "objects": ["defect_costs", "refunds", "reprints"],
+      "access_mode": "export", "pii_level": "commercial", "migration_status": "contract_ready",
+      "notes": "Себестоимость брака, возвраты, перепечатки."
+    },
+    {
+      "system": "logistics_ru", "name": "Логистика RU", "department": "logistics",
+      "objects": ["shipments", "pvz", "nezabory", "tracking"],
+      "access_mode": "webhook", "pii_level": "personal", "migration_status": "contract_ready",
+      "notes": "Яндекс, 5Post, СДЭК, Почта; ПВЗ и незаборы."
+    },
+    {
+      "system": "logistics_by", "name": "Логистика BY", "department": "logistics",
+      "objects": ["shipments", "tracking", "redelivery"],
+      "access_mode": "webhook", "pii_level": "personal", "migration_status": "contract_ready",
+      "notes": "Европочта, EMS, Белпочта."
+    },
+    {
+      "system": "picpac_app", "name": "picPac App", "department": "retail",
+      "objects": ["funnel", "designs", "orders"],
+      "access_mode": "webhook", "pii_level": "none", "migration_status": "contract_ready",
+      "notes": "Минимальные PII: session_token токенизируется на входе."
+    }
+  ]
+}

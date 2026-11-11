@@ -302,3 +302,39 @@ class MetricCatalogDTO(BaseModel):
     total: int
     department: str | None = None
     items: list[MetricCatalogItemDTO]
+
+# ──────────────────────────────────────────────────────────────────────
+# T20: Migration Layer (PLAN-V2 §22.6, §22.10) — additive
+# ──────────────────────────────────────────────────────────────────────
+
+class MigrationSourceDTO(BaseModel):
+    """Источник данных для миграции. Реальный перенос — после доступов, сейчас контракт."""
+    system: str
+    name: str
+    department: str
+    objects: list[str]
+    access_mode: Literal["read_api", "export", "webhook", "manual_csv"]
+    pii_level: Literal["none", "personal", "commercial"]
+    migration_status: Literal["contract_ready", "emulator", "pending_access"]
+    notes: str | None = None
+
+
+class MigrationStepDTO(BaseModel):
+    """Шаг демо-миграции. mode=real — шаг делает настоящую работу, emulator — заглушка."""
+    n: int
+    key: str
+    title: str
+    status: Literal["completed", "failed", "skipped"]
+    detail: str
+    mode: Literal["real", "emulator"] = "emulator"
+
+
+class MigrationRunDTO(BaseModel):
+    """Ответ POST /api/migration/demo-run. Записывается в таблицу migration_runs."""
+    run_id: str
+    status: Literal["completed", "failed"]
+    mode: Literal["emulator"] = "emulator"
+    created_at: datetime
+    sources_count: int
+    pii_sources: int
+    steps: list[MigrationStepDTO]
