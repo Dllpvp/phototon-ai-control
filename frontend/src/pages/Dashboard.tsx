@@ -26,7 +26,7 @@ function HeroRow() {
   const scenario = useUIStore((state) => state.scenario);
   const query = useDashboard(scenario);
   const lossKpi = query.data?.kpis.find((kpi) => kpi.node_id === "fin_loss_day");
-  return <Section title="Сводка недели" subtitle={<span className="mono">{query.data?.headline ?? "—"}</span>} className="col-span-full"><div className="flex flex-wrap items-end justify-between gap-6">{query.data && lossKpi ? <LossCounter lossDay={lossKpi.value} startedAt={query.data.loss_counter_started_at} /> : <div className="flex flex-col gap-1" style={{ minWidth: 0 }}><SkeletonLine width="9rem" /><SkeletonLine width="14rem" /></div>}<DemoBadge /></div></Section>;
+  return <Section title="Сводка недели" subtitle={<span className="mono">{query.data?.headline ?? "—"}</span>} className="col-span-full"><div className="flex flex-wrap items-end justify-between gap-6">{query.data && lossKpi && lossKpi.value !== null ? <LossCounter lossDay={lossKpi.value} startedAt={query.data.loss_counter_started_at} /> : <div className="flex flex-col gap-1" style={{ minWidth: 0 }}><SkeletonLine width="9rem" /><SkeletonLine width="14rem" /></div>}<DemoBadge /></div></Section>;
 }
 
 function ChainPanelSection() {

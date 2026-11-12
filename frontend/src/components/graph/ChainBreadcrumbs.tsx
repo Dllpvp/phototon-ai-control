@@ -39,6 +39,11 @@ export function ChainBreadcrumbs({ chain, activeNodeId }: ChainBreadcrumbsProps)
             title={node.name}
           >
             {node.name}
+            {node.status === "hidden" && (
+              <span className="tag" style={{ fontSize: "8px", color: "var(--muted)" }}>
+                скрыто
+              </span>
+            )}
             {node.status === "red" && (
               <span className="tag" style={{ fontSize: "8px", color: "var(--alert)" }}>
                 red

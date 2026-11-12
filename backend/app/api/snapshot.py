@@ -5,12 +5,13 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
 from app.core.economics import node_cost_per_day, node_status
 from app.core.loader import GraphPayload, NormRecord, load_norms, load_scenario
 from app.dependencies import get_graph
 from app.schemas import GraphEdge, GraphNode, Norm, Snapshot
+from app.security.rbac import HIDDEN_STATUS, get_allowed_domains, get_dept, get_role
 
 
 router = APIRouter(prefix="", tags=["snapshot"])
@@ -57,8 +58,24 @@ def build_nodes(
     return nodes
 
 
+def hide_graph_values(nodes: list[GraphNode], allowed: set[str] | None) -> list[GraphNode]:
+    """Скрывает значения узлов недоступных доменов, сохраняя узлы, порядок и рёбра (§22.3)."""
+    if allowed is None:
+        return nodes
+
+    return [
+        node
+        if node.domain in allowed
+        else node.model_copy(
+            update={"value": None, "status": HIDDEN_STATUS, "cost_per_day": None}
+        )
+        for node in nodes
+    ]
+
+
 @router.get("/snapshot", response_model=Snapshot)
 async def get_snapshot(
+    request: Request,
     scenario: str = Query("main", description="ID сценария: main|neg|peak"),
     graph: GraphPayload = Depends(get_graph),
 ) -> Snapshot:
@@ -73,6 +90,8 @@ async def get_snapshot(
 
     node_values = {n.id: n.value for n in scenario_data.nodes}
     nodes = build_nodes(graph, node_values, norms)
+    allowed = get_allowed_domains(get_role(request), get_dept(request))
+    nodes = hide_graph_values(nodes, allowed)
 
     edges = [
         GraphEdge(

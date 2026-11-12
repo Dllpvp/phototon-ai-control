@@ -65,8 +65,9 @@ export const queryKeys = {
 } as const;
 
 export function useSnapshot(scenario: string): UseQueryResult<Snapshot, Error> {
+  const scope = useRoleScope();
   return useQuery({
-    queryKey: queryKeys.snapshot(scenario),
+    queryKey: [...queryKeys.snapshot(scenario), ...scope],
     queryFn: () => getJson<Snapshot>(`/api/snapshot${qs({ scenario })}`),
   });
 }

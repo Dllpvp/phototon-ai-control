@@ -35,9 +35,9 @@ class GraphNode(BaseModel):
     domain: Literal["finance", "clients", "production", "hr", "quality", "season"]
     name: str
     unit: str
-    value: float
+    value: float | None
     norm: Norm | None = None
-    status: Literal["red", "yellow", "green"]
+    status: Literal["red", "yellow", "green", "hidden"]
     cost_per_day: float | None = None
     description: str | None = None
     literal: bool = False
@@ -97,7 +97,7 @@ class KpiDTO(BaseModel):
     name: str
     unit: str
     value: float
-    status: Literal["red", "yellow", "green"]
+    status: Literal["red", "yellow", "green", "hidden"]
     norm: Norm | None = None
     cost_per_day: float | None = None
 
@@ -167,7 +167,7 @@ class UnitEconDTO(BaseModel):
     labor: float
     defect: float
     margin_pct: float
-    status: Literal["red", "yellow", "green"] = "green"
+    status: Literal["red", "yellow", "green", "hidden"] = "green"
 
 
 class ChainNodeDTO(BaseModel):

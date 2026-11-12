@@ -13,7 +13,7 @@ export type Domain =
   | "quality"
   | "season";
 
-export type NodeStatus = "red" | "yellow" | "green";
+export type NodeStatus = "red" | "yellow" | "green" | "hidden";
 
 export type EdgeSign = -1 | 1;
 
@@ -30,7 +30,7 @@ export interface GraphNode {
   domain: Domain;
   name: string;
   unit: string;
-  value: number;
+  value: number | null;
   norm: Norm | null;
   status: NodeStatus;
   cost_per_day: number | null;

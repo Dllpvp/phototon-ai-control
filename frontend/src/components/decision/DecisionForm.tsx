@@ -83,7 +83,13 @@ export function DecisionForm() {
         pushToast({ kind: "success", text: `${decision.jira_key ?? "Решение"} создан · Telegram: ${telegramStatus}` });
         close(false);
       },
-      onError: () => setValidationError("Не удалось оформить решение. Повторите попытку."),
+      onError: (error: unknown) => {
+        if (error instanceof Error && "status" in error && (error as { status?: number }).status === 403) {
+          pushToast({ kind: "error", text: "Недостаточно прав: сотрудник эскалирует руководителю" });
+          return;
+        }
+        setValidationError("Не удалось оформить решение. Повторите попытку.");
+      },
     });
   };
 

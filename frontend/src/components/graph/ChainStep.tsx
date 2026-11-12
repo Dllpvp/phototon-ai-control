@@ -15,7 +15,10 @@ export function ChainStep({ node, sliceQuery, edgeNote }: ChainStepProps) {
   const facts = data?.facts ?? [];
   const nodeFacts = facts.filter((f) => f.metric === node.node_id);
 
-  const valueLine = `${node.value}${node.unit}`;
+  const valueLine =
+    node.status === "hidden" || node.value === null
+      ? "скрыто"
+      : `${node.value}${node.unit}`;
 
   return (
     <div className="card" style={{ padding: "1rem", border: "1px solid var(--hair)" }}>
@@ -27,7 +30,9 @@ export function ChainStep({ node, sliceQuery, edgeNote }: ChainStepProps) {
           className="mono text-xs"
           style={{
             color:
-              node.status === "red"
+              node.status === "hidden"
+                ? "var(--muted)"
+                : node.status === "red"
                 ? "var(--alert)"
                 : node.status === "yellow"
                 ? "var(--warn)"

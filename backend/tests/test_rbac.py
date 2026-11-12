@@ -183,3 +183,33 @@ def test_default_role_constant():
 def test_audit_endpoint_rbac(role: str, expected: int):
     resp = client.get("/api/security/audit", headers=get_auth_headers(role))
     assert resp.status_code == expected
+
+
+# ── T9h: /api/snapshot не отдаёт финансы production_head ──────────────
+def _snapshot_nodes(headers: dict[str, str]) -> dict[str, dict]:
+    resp = client.get("/api/snapshot", headers=headers)
+    assert resp.status_code == 200
+    return {node["id"]: node for node in resp.json()["nodes"]}
+
+
+def test_snapshot_hides_finance_for_production_head():
+    nodes = _snapshot_nodes(get_auth_headers("production_head", "production"))
+    fin = nodes["fin_loss_day"]
+    assert fin["value"] is None
+    assert fin["status"] == "hidden"
+
+
+def test_snapshot_keeps_finance_for_director():
+    nodes = _snapshot_nodes(get_auth_headers("director"))
+    fin = nodes["fin_loss_day"]
+    assert isinstance(fin["value"], (int, float))
+    assert fin["status"] != "hidden"
+
+
+def test_snapshot_structure_identical_across_roles():
+    director = client.get("/api/snapshot", headers=get_auth_headers("director")).json()
+    prod = client.get(
+        "/api/snapshot", headers=get_auth_headers("production_head", "production")
+    ).json()
+    assert len(director["nodes"]) == len(prod["nodes"])
+    assert len(director["edges"]) == len(prod["edges"])

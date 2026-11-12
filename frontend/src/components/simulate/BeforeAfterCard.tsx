@@ -11,6 +11,7 @@ const STATUS_COLOR: Record<NodeStatus, string> = {
   red: "var(--alert)",
   yellow: "var(--warn)",
   green: "var(--ok)",
+  hidden: "var(--muted)",
 };
 
 function getNodeColor(entry: { status?: NodeStatus }): string {
@@ -44,7 +45,9 @@ function buildBefore(
 ): Record<string, number> {
   if (decision?.baseline_snapshot) return decision.baseline_snapshot;
   const out: Record<string, number> = {};
-  for (const node of fallbackSnapshot?.nodes ?? []) out[node.id] = node.value;
+  for (const node of fallbackSnapshot?.nodes ?? []) {
+    if (node.value !== null) out[node.id] = node.value;
+  }
   return out;
 }
 

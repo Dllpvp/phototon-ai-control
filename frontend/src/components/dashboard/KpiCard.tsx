@@ -7,12 +7,14 @@ const STATUS_COLOR: Record<NodeStatus, string> = {
   red: "var(--alert)",
   yellow: "var(--warn)",
   green: "var(--ok)",
+  hidden: "var(--muted)",
 };
 
 const STATUS_LABEL: Record<NodeStatus, string> = {
   red: "АЛЕРТ",
   yellow: "ВНИМАНИЕ",
   green: "НОРМА",
+  hidden: "СКРЫТО",
 };
 
 /** Форматирует числовое значение метрики БЕЗ единицы измерения — её рисуем отдельной строкой. */
