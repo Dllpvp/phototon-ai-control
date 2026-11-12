@@ -20,6 +20,7 @@ from app.api import (
     metrics,
     migration,
     incidents,
+    security,
 )
 
 router = APIRouter(prefix="/api")
@@ -38,3 +39,4 @@ router.include_router(report.router)
 router.include_router(metrics.router)
 router.include_router(migration.router)
 router.include_router(incidents.router)
+router.include_router(security.router)

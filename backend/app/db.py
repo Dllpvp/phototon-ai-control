@@ -81,6 +81,21 @@ class DecisionStore:
                     value INTEGER NOT NULL
                 )
             """)
+            # T9d: журнал аудита ИИ-вызовов (PLAN-V2 §6.5).
+            # Пишет только masked-payload + sha256 сырого; сырой текст не хранится.
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS ai_audit (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    ts TEXT NOT NULL,
+                    backend TEXT NOT NULL,
+                    mask_level TEXT NOT NULL,
+                    tokens_count INTEGER NOT NULL,
+                    payload_masked_json TEXT NOT NULL,
+                    payload_sha256 TEXT NOT NULL,
+                    verdict TEXT NOT NULL,
+                    reason TEXT
+                )
+            """)
             self._migrate_decisions(conn)
             conn.commit()
 
