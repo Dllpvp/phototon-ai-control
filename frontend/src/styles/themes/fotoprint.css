@@ -1,0 +1,130 @@
+/* Тема fotoprint — токены + skin-слой из root index.html.
+   Провенанс: docs/design/fotoprint-source.html. Все цвета — только здесь. */
+
+/* Уровень 1: шрифты/радиус/тень + приватные skin-токены */
+[data-theme="fotoprint"] {
+  --font-display: "Plus Jakarta Sans", system-ui, sans-serif; /* Onest → замена @fontsource */
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;      /* derived: в источнике нет mono */
+  --font-serif: "Instrument Serif", Georgia, serif;           /* derived: в источнике нет serif */
+  --radius: 28px;                                             /* .c / .sc */
+  --shadow-strength: 2;                                       /* derived: мягкие тени, паттерн zen */
+  --fp-mesh: radial-gradient(60% 70% at 10% 20%, #fff6b3 0, transparent 62%),
+             radial-gradient(50% 65% at 16% 90%, #ffa43a 0, transparent 62%),
+             radial-gradient(60% 60% at 94% 100%, #ffae10 0, transparent 62%),
+             radial-gradient(45% 55% at 100% 0, #dfb02a 0, transparent 62%);
+  --fp-mesh-base: #ffde40;                                    /* .mesh base */
+  --fp-mesh-ink: #1b1813;                                     /* текст на mesh */
+  --fp-mesh-muted: rgba(27, 24, 19, 0.72);
+}
+
+/* Уровень 2: light (базовая палитра источника) */
+[data-theme="fotoprint"][data-mode="light"] {
+  --bg: #f6f3ec;                          /* --bg */
+  --panel: rgba(255, 255, 255, 0.76);     /* --card */
+  --panel-2: #ece6d8;                     /* --bar */
+  --hair: rgba(60, 45, 10, 0.09);         /* --line */
+  --hair-strong: rgba(60, 45, 10, 0.1);   /* --rim2 */
+  --text: #1b1813;                        /* --ink */
+  --muted: #80796b;                       /* --mut */
+  --alert: #e5484d;                       /* --red */
+  --alert-soft: rgba(229, 72, 77, 0.1);   /* derived */
+  --warn: #f5b301;                        /* --yel */
+  --warn-soft: rgba(245, 179, 1, 0.12);   /* derived */
+  --ok: #2da66b;                          /* --grn */
+  --ok-soft: rgba(45, 166, 107, 0.1);     /* derived */
+  --accent: #1b1813;                      /* --act */
+  --accent-2: #2da66b;                    /* derived: = --ok, паттерн swiss/zen */
+  --paper: rgba(255, 255, 255, 0.95);     /* --cardb */
+  --paper-ink: #1b1813;
+  --shadow: rgba(120, 90, 20, 0.09);      /* --sh */
+  --fp-rim: rgba(255, 255, 255, 0.95);    /* --rim */
+  --fp-rim2: rgba(60, 45, 10, 0.1);       /* --rim2 */
+  --fp-cardb: rgba(255, 255, 255, 0.95);  /* --cardb */
+  --fp-glass: rgba(255, 255, 255, 0.5);   /* derived: --g навигации */
+  --fp-nav: rgba(255, 255, 255, 0.6);     /* derived: стекло навигации */
+  --fp-glow-a: rgba(255, 176, 40, 0.22);  /* body glow */
+  --fp-glow-b: rgba(255, 226, 90, 0.22);
+}
+
+/* Уровень 2: dark (вторая палитра источника) */
+[data-theme="fotoprint"][data-mode="dark"] {
+  --bg: #0e0d0a;
+  --panel: rgba(36, 33, 26, 0.74);        /* --card dark */
+  --panel-2: #2f2b22;                     /* --bar dark */
+  --hair: rgba(255, 255, 255, 0.09);
+  --hair-strong: rgba(255, 255, 255, 0.22); /* --rim dark */
+  --text: #f4f0e6;
+  --muted: #a39d8e;
+  --alert: #f0616a;
+  --alert-soft: rgba(240, 97, 106, 0.15); /* derived */
+  --warn: #f5b301;                        /* в dark источника не переопределён */
+  --warn-soft: rgba(245, 179, 1, 0.15);   /* derived */
+  --ok: #3dbb7e;
+  --ok-soft: rgba(61, 187, 126, 0.15);    /* derived */
+  --accent: #f4f0e6;                      /* derived: --ink для контраста, паттерн zen dark */
+  --accent-2: #3dbb7e;                    /* derived: = --ok dark */
+  --paper: rgba(36, 33, 26, 0.95);        /* derived */
+  --paper-ink: #f4f0e6;
+  --shadow: rgba(0, 0, 0, 0.4);
+  --fp-rim: rgba(255, 255, 255, 0.22);    /* --rim dark */
+  --fp-rim2: rgba(0, 0, 0, 0.5);          /* --rim2 dark */
+  --fp-cardb: rgba(255, 255, 255, 0.1);   /* --cardb dark */
+  --fp-glass: rgba(255, 255, 255, 0.08);  /* derived */
+  --fp-nav: rgba(36, 33, 26, 0.6);        /* derived */
+  --fp-glow-a: rgba(245, 179, 1, 0.1);    /* derived: glow слабее */
+  --fp-glow-b: rgba(255, 226, 90, 0.1);
+}
+
+/* Уровень 3: skin-слой (только fotoprint, компоненты не правим) */
+
+/* тёплый glow-фон страницы, как body в источнике */
+[data-theme="fotoprint"] body {
+  background-image:
+    radial-gradient(620px 420px at 100% 45%, var(--fp-glow-a), transparent),
+    radial-gradient(560px 420px at 0 80%, var(--fp-glow-b), transparent);
+  background-attachment: fixed;
+}
+
+/* стекло карточек: blur + inset-ободки + мягкая тень, как .c/.sc */
+[data-theme="fotoprint"] .card {
+  backdrop-filter: blur(22px) saturate(170%);
+  -webkit-backdrop-filter: blur(22px) saturate(170%);
+  border-color: var(--fp-cardb);
+  box-shadow: inset 1px 1px 1px var(--fp-rim), inset -1px -1px 3px var(--fp-rim2),
+    0 10px 30px var(--shadow);
+}
+
+/* mesh-герой: первая полноширинная карточка сетки дашборда */
+[data-theme="fotoprint"] .grid > .card.col-span-full:first-child {
+  background-image: var(--fp-mesh);
+  background-color: var(--fp-mesh-base);
+  border-color: transparent;
+  border-radius: 36px;
+  --text: var(--fp-mesh-ink);       /* inline-стили Section читают var() → чернила на mesh */
+  --muted: var(--fp-mesh-muted);
+  box-shadow: 0 8px 20px rgba(150, 90, 0, 0.16);
+}
+
+/* pill-навигация: sticky-стекло, как .nav */
+[data-theme="fotoprint"] header:has(span.tracking-tight) {
+  position: sticky;
+  top: 12px;
+  z-index: 50;
+  margin: 0 12px 12px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border-bottom: 0 !important; /* глушим inline-бордер Header.tsx только в fotoprint */
+  backdrop-filter: blur(18px) saturate(190%);
+  -webkit-backdrop-filter: blur(18px) saturate(190%);
+  background: var(--fp-nav);
+  box-shadow: inset 1px 1px 1px var(--fp-rim), 0 8px 20px var(--shadow);
+}
+
+/* pill-кнопки/бейджи, как button.gl / .pill */
+[data-theme="fotoprint"] .tag {
+  border-radius: 999px;
+  padding: 6px 14px;
+  background: var(--fp-glass);
+  border-color: var(--fp-cardb);
+  box-shadow: inset 1px 1px 1px var(--fp-rim);
+}

@@ -1,0 +1,1029 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Фотопринт — управленческий контур</title>
+    <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f6f3ec;
+            --card: rgba(255, 255, 255, .76);
+            --cardb: rgba(255, 255, 255, .95);
+            --ink: #1b1813;
+            --mut: #80796b;
+            --line: rgba(60, 45, 10, .09);
+            --bar: #ece6d8;
+            --red: #e5484d;
+            --yel: #f5b301;
+            --grn: #2da66b;
+            --g: rgba(60, 45, 10, .05);
+            --gb: rgba(255, 255, 255, .9);
+            --rim: rgba(255, 255, 255, .95);
+            --rim2: rgba(60, 45, 10, .1);
+            --sh: 0 10px 30px rgba(120, 90, 20, .09);
+            --act: #1b1813;
+            --actx: #fff;
+            --glow: .22;
+            color-scheme: light;
+            box-sizing: border-box;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px)
+        }
+
+        @media (prefers-color-scheme:dark) {
+            :root:not([data-theme="light"]) {
+                --bg: #0e0d0a;
+                --card: rgba(36, 33, 26, .74);
+                --cardb: rgba(255, 255, 255, .1);
+                --ink: #f4f0e6;
+                --mut: #a39d8e;
+                --line: rgba(255, 255, 255, .09);
+                --bar: #2f2b22;
+                --red: #f0616a;
+                --grn: #3dbb7e;
+                --g: rgba(255, 255, 255, .07);
+                --gb: rgba(255, 255, 255, .16);
+                --rim: rgba(255, 255, 255, .22);
+                --rim2: rgba(0, 0, 0, .5);
+                --sh: 0 10px 30px rgba(0, 0, 0, .4);
+                --act: #3b362a;
+                --actx: #f4f0e6;
+                --glow: .1;
+                color-scheme: dark
+            }
+        }
+
+        :root[data-theme="dark"] {
+            --bg: #0e0d0a;
+            --card: rgba(36, 33, 26, .74);
+            --cardb: rgba(255, 255, 255, .1);
+            --ink: #f4f0e6;
+            --mut: #a39d8e;
+            --line: rgba(255, 255, 255, .09);
+            --bar: #2f2b22;
+            --red: #f0616a;
+            --grn: #3dbb7e;
+            --g: rgba(255, 255, 255, .07);
+            --gb: rgba(255, 255, 255, .16);
+            --rim: rgba(255, 255, 255, .22);
+            --rim2: rgba(0, 0, 0, .5);
+            --sh: 0 10px 30px rgba(0, 0, 0, .4);
+            --act: #3b362a;
+            --actx: #f4f0e6;
+            --glow: .1;
+            color-scheme: dark
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 90px
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--ink);
+            font: 400 14px/1.45 Onest, system-ui, sans-serif;
+            background-image: radial-gradient(620px 420px at 100% 45%, rgba(255, 176, 40, var(--glow)), transparent), radial-gradient(560px 420px at 0 80%, rgba(255, 226, 90, var(--glow)), transparent);
+            background-attachment: fixed
+        }
+
+        button {
+            font: inherit;
+            color: inherit
+        }
+
+        .mut {
+            color: var(--mut)
+        }
+
+        .sm {
+            font-size: 12px
+        }
+
+        .shell {
+            padding: 12px clamp(12px, 2.2vw, 40px) 48px
+        }
+
+        .mesh {
+            background: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .96 0 0 0 0 .6 .55 0 0 0 -.22'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"), radial-gradient(60% 70% at 10% 20%, #fff6b3 0, transparent 62%), radial-gradient(50% 65% at 16% 90%, #ffa43a 0, transparent 62%), radial-gradient(60% 60% at 94% 100%, #ffae10 0, transparent 62%), radial-gradient(45% 55% at 100% 0, #dfb02a 0, transparent 62%), #ffde40
+        }
+
+        .nav,
+        .hero {
+            --g: rgba(255, 255, 255, .34);
+            --gb: rgba(255, 255, 255, .75);
+            --rim: rgba(255, 255, 255, .95);
+            --rim2: rgba(120, 70, 0, .18);
+            --sh: 0 8px 20px rgba(150, 90, 0, .16)
+        }
+
+        .gl {
+            background: linear-gradient(160deg, rgba(255, 255, 255, .4), transparent 70%), var(--g);
+            border: 1px solid var(--gb);
+            backdrop-filter: blur(18px) saturate(190%);
+            -webkit-backdrop-filter: blur(18px) saturate(190%);
+            box-shadow: inset 1px 1px 1px var(--rim), inset -1px -1px 3px var(--rim2), var(--sh)
+        }
+
+        button.gl {
+            cursor: pointer;
+            min-height: 44px;
+            border-radius: 999px;
+            padding: 0 20px;
+            font-weight: 500;
+            transition: .2s
+        }
+
+        button.gl:hover {
+            transform: translateY(-1px)
+        }
+
+        button.dk {
+            color: #fff;
+            border-color: rgba(255, 255, 255, .18);
+            background: linear-gradient(160deg, rgba(255, 255, 255, .22), transparent 60%), #1b1813
+        }
+
+        .nav {
+            position: sticky;
+            top: calc(env(safe-area-inset-top, 0px) + 12px);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 8px 8px 8px 14px;
+            border-radius: 999px;
+            margin: 0 12px -74px;
+            color: #1b1813
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 18px;
+            flex: none
+        }
+
+        .logo svg {
+            background: rgba(255, 255, 255, .55);
+            border-radius: 50%;
+            padding: 2px
+        }
+
+        .tabs {
+            display: flex;
+            gap: 4px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding: 2px
+        }
+
+        .tabs::-webkit-scrollbar {
+            display: none
+        }
+
+        .tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 0;
+            background: none;
+            border-radius: 999px;
+            min-height: 44px;
+            padding: 0 16px;
+            cursor: pointer;
+            font-weight: 500;
+            white-space: nowrap;
+            color: #1b1813;
+            transition: .2s
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, .4)
+        }
+
+        .tab.on {
+            background: #1b1813;
+            color: #fff;
+            box-shadow: inset 1px 1px 1px rgba(255, 255, 255, .3)
+        }
+
+        .hero {
+            border-radius: 36px;
+            padding: 104px 32px 110px;
+            color: #1b1813;
+            position: relative
+        }
+
+        .hero h1 {
+            margin: 14px 0 6px;
+            font-size: 48px;
+            letter-spacing: -.03em;
+            font-weight: 500;
+            line-height: 1.05
+        }
+
+        .hero p {
+            margin: 0;
+            max-width: 520px;
+            color: rgba(27, 24, 19, .7);
+            font-size: 15px
+        }
+
+        .hero .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 16px;
+            flex-wrap: wrap
+        }
+
+        .crumb {
+            display: inline-flex;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 500
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin: -64px 16px 14px;
+            position: relative;
+            z-index: 2
+        }
+
+        .c:not(.mesh),
+        .sc {
+            background: var(--card)
+        }
+
+        .c,
+        .sc {
+            border: 1px solid var(--cardb);
+            border-radius: 28px;
+            backdrop-filter: blur(22px) saturate(170%);
+            -webkit-backdrop-filter: blur(22px) saturate(170%);
+            box-shadow: var(--sh)
+        }
+
+        .c {
+            padding: 22px;
+            min-width: 0
+        }
+
+        .sc {
+            text-align: left;
+            padding: 18px 20px;
+            cursor: pointer;
+            transition: .2s
+        }
+
+        .sc:hover {
+            transform: translateY(-2px)
+        }
+
+        .sc.on {
+            border-color: var(--ink);
+            box-shadow: inset 0 0 0 1px var(--ink), var(--sh)
+        }
+
+        .sc .sh {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500
+        }
+
+        .sc .ar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1px solid currentColor;
+            display: grid;
+            place-items: center;
+            font-size: 13px;
+            opacity: .7
+        }
+
+        .sc .sn {
+            font-size: 46px;
+            font-weight: 500;
+            letter-spacing: -.03em;
+            line-height: 1;
+            margin: 12px 0 6px
+        }
+
+        .sc .ss {
+            font-size: 12px;
+            color: var(--mut);
+            display: flex;
+            align-items: center;
+            gap: 7px
+        }
+
+        .sc .ss i {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%
+        }
+
+        .sc.d {
+            background: linear-gradient(160deg, #2e2a20, #15130e);
+            color: #fff;
+            border-color: transparent
+        }
+
+        .sc.d .ss {
+            color: rgba(255, 255, 255, .65)
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, minmax(0, 1fr));
+            gap: 14px;
+            margin: 0 16px
+        }
+
+        .s5 {
+            grid-column: span 5
+        }
+
+        .s4 {
+            grid-column: span 4
+        }
+
+        .s3 {
+            grid-column: span 3
+        }
+
+        .s7 {
+            grid-column: span 7
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 500
+        }
+
+        .sub {
+            font-size: 12px;
+            color: var(--mut);
+            margin: 2px 0 14px
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 5px 12px;
+            border-radius: 999px;
+            background: var(--g);
+            border: 1px solid var(--gb);
+            box-shadow: inset 1px 1px 1px var(--rim), inset -1px -1px 2px var(--rim2);
+            white-space: nowrap
+        }
+
+        .pill i {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%
+        }
+
+        .big {
+            font-size: 46px;
+            font-weight: 500;
+            letter-spacing: -.03em;
+            line-height: 1.1
+        }
+
+        .big small {
+            font-size: 16px;
+            color: var(--mut)
+        }
+
+        .wr {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: 1px solid transparent;
+            border-radius: 14px;
+            padding: 6px 8px;
+            margin-bottom: 2px
+        }
+
+        button.wr {
+            cursor: pointer
+        }
+
+        button.wr:hover,
+        .wr.on {
+            background: var(--g)
+        }
+
+        .wr.on {
+            border-color: var(--line)
+        }
+
+        .wl {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 13px
+        }
+
+        .wl b {
+            font-weight: 500;
+            color: var(--mut);
+            white-space: nowrap
+        }
+
+        .tr {
+            position: relative;
+            height: 16px;
+            margin-top: 6px
+        }
+
+        .tr i {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            border-radius: 999px
+        }
+
+        .tr .hatch {
+            background: linear-gradient(90deg, color-mix(in srgb, var(--k) 90%, transparent), color-mix(in srgb, var(--k) 30%, transparent));
+            box-shadow: 0 4px 14px color-mix(in srgb, var(--k) 28%, transparent)
+        }
+
+        .tr .sol {
+            background: linear-gradient(90deg, var(--k), color-mix(in srgb, var(--k) 50%, transparent));
+            box-shadow: 0 4px 16px color-mix(in srgb, var(--k) 35%, transparent)
+        }
+
+        .ins {
+            border: 0;
+            color: #1b1813;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            --g: rgba(255, 255, 255, .34);
+            --gb: rgba(255, 255, 255, .75);
+            --rim: rgba(255, 255, 255, .95);
+            --rim2: rgba(120, 70, 0, .18)
+        }
+
+        .ins .tp {
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .ins .bn {
+            font-size: 56px;
+            font-weight: 500;
+            letter-spacing: -.04em;
+            line-height: 1
+        }
+
+        .ins .tt {
+            font-size: 18px;
+            font-weight: 500;
+            line-height: 1.25
+        }
+
+        .ins .ds {
+            color: rgba(27, 24, 19, .72);
+            font-size: 13px
+        }
+
+        .ins .chs {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap
+        }
+
+        .ins .ch {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(27, 24, 19, .3)
+        }
+
+        .ins .ch.on {
+            background: #1b1813;
+            color: #fff;
+            border-color: #1b1813
+        }
+
+        .ins .nb {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            margin-left: 4px;
+            padding: 0 !important;
+            min-height: 34px !important
+        }
+
+        .ins .go {
+            margin-top: auto;
+            text-align: left
+        }
+
+        .gr h3 {
+            margin: 14px 8px 4px;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: .08em;
+            color: var(--mut);
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .row2 {
+            display: grid;
+            grid-template-columns: 12px 1fr 64px 92px;
+            gap: 12px;
+            align-items: center;
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: 0;
+            border-radius: 18px;
+            padding: 10px 12px;
+            cursor: pointer;
+            min-height: 54px
+        }
+
+        .row2:hover {
+            background: var(--g)
+        }
+
+        .row2.on {
+            background: var(--g);
+            box-shadow: inset 3px 0 0 var(--ink)
+        }
+
+        .row2 .d {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--k)
+        }
+
+        .row2 .p {
+            font-size: 12px;
+            color: var(--mut)
+        }
+
+        .row2 .v {
+            text-align: right;
+            font-weight: 500;
+            font-size: 16px
+        }
+
+        .row2 .v small {
+            color: var(--mut);
+            font-size: 12px
+        }
+
+        .row2 svg {
+            color: var(--mut)
+        }
+
+        .hd2 {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            flex-wrap: wrap
+        }
+
+        .srch {
+            width: 200px;
+            min-height: 40px;
+            border-radius: 999px;
+            border: 1px solid var(--gb);
+            color: var(--ink);
+            font: inherit;
+            padding: 0 16px;
+            outline: 0
+        }
+
+        .nd {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: 0;
+            border-top: 1px solid var(--line);
+            padding: 12px 4px;
+            cursor: pointer
+        }
+
+        .nd:first-child {
+            border-top: 0
+        }
+
+        .nd:hover {
+            background: var(--g);
+            border-radius: 14px
+        }
+
+        .tile {
+            width: 40px;
+            height: 40px;
+            border-radius: 13px;
+            display: grid;
+            place-items: center;
+            flex: none;
+            background: color-mix(in srgb, var(--k) 16%, transparent);
+            color: var(--k)
+        }
+
+        .nd b {
+            display: block;
+            font-weight: 500;
+            font-size: 13px
+        }
+
+        .nd small {
+            color: var(--mut);
+            font-size: 12px
+        }
+
+        svg.i {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.7;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+
+        .fld {
+            margin-bottom: 12px
+        }
+
+        .fld label {
+            display: block;
+            font-size: 12px;
+            color: var(--mut);
+            margin-bottom: 6px
+        }
+
+        .f2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px
+        }
+
+        .sel {
+            position: relative;
+            display: block
+        }
+
+        .sel-b {
+            width: 100%;
+            text-align: left;
+            padding-right: 36px !important;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .sel-b:after {
+            content: "";
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            width: 7px;
+            height: 7px;
+            border: solid var(--mut);
+            border-width: 0 2px 2px 0;
+            transform: translateY(-70%) rotate(45deg)
+        }
+
+        .sel-l {
+            display: none;
+            position: absolute;
+            z-index: 30;
+            top: calc(100% + 6px);
+            left: 0;
+            min-width: 100%;
+            margin: 0;
+            padding: 6px;
+            list-style: none;
+            border-radius: 22px;
+            background-color: color-mix(in srgb, var(--bg) 70%, transparent);
+            border: 1px solid var(--gb);
+            backdrop-filter: blur(26px) saturate(190%);
+            -webkit-backdrop-filter: blur(26px) saturate(190%);
+            box-shadow: inset 1px 1px 1px var(--rim), 0 18px 40px rgba(60, 40, 0, .25)
+        }
+
+        .sel.open .sel-l {
+            display: block
+        }
+
+        .sel.up .sel-l {
+            top: auto;
+            bottom: calc(100% + 6px)
+        }
+
+        .sel-l li {
+            padding: 10px 14px;
+            border-radius: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+            min-height: 44px;
+            display: flex;
+            align-items: center
+        }
+
+        .sel-l li:hover {
+            background: var(--g)
+        }
+
+        .sel-l li[aria-selected=true] {
+            background: var(--act);
+            color: var(--actx)
+        }
+
+        input.in {
+            width: 100%;
+            min-height: 44px;
+            font: inherit;
+            color: var(--ink);
+            border-radius: 999px;
+            padding: 0 16px;
+            outline: 0;
+            border: 1px solid var(--gb)
+        }
+
+        .li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding: 14px 0;
+            border-top: 1px solid var(--line)
+        }
+
+        .li small {
+            display: block;
+            color: var(--mut)
+        }
+
+        .empty {
+            color: var(--mut);
+            padding: 12px 4px
+        }
+
+        @media(max-width:1200px) {
+            .s5 {
+                grid-column: span 7
+            }
+
+            .s4 {
+                grid-column: span 5
+            }
+
+            .s3 {
+                grid-column: span 12
+            }
+        }
+
+        @media(max-width:860px) {
+
+            .s5,
+            .s4,
+            .s3,
+            .s7 {
+                grid-column: span 12
+            }
+
+            .stats {
+                grid-template-columns: 1fr 1fr;
+                margin: -64px 6px 14px
+            }
+
+            .grid {
+                margin: 0 6px
+            }
+
+            .hero {
+                padding: 96px 20px 100px
+            }
+
+            .hero h1 {
+                font-size: 34px
+            }
+
+            .logo span {
+                display: none
+            }
+
+            .nav {
+                margin: 0 4px -74px
+            }
+        }
+
+        @media(max-width:520px) {
+            .stats {
+                grid-template-columns: 1fr
+            }
+
+            .f2 {
+                grid-template-columns: 1fr
+            }
+
+            .row2 {
+                grid-template-columns: 12px 1fr 84px
+            }
+
+            .row2 svg {
+                display: none
+            }
+
+            .srch {
+                width: 100%
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="shell">
+        <nav class="nav gl" id="navb">
+            <div class="logo" id="lg0"></div>
+            <div class="tabs" id="tabs"></div><button class="gl" id="th" aria-label="Сменить тему"
+                style="width:44px;padding:0;flex:none">◐</button>
+        </nav>
+        <header class="hero mesh"><span class="crumb gl" id="crumb"></span>
+            <div class="row">
+                <div>
+                    <h1 id="h1"></h1>
+                    <p id="sub"></p>
+                </div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="gl dk" id="b1">Оформить решение
+                        →</button><button class="gl" id="b2">Журнал решений</button></div>
+            </div>
+        </header>
+        <div class="stats" id="stats"></div>
+        <main class="grid">
+            <section class="c s5">
+                <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
+                    <div>
+                        <h2 id="dn"></h2>
+                        <div class="sub" id="ds"></div>
+                    </div>
+                    <div id="dp"></div>
+                </div>
+                <div class="big" id="dv"></div>
+                <div id="ch" style="margin-top:6px"></div>
+            </section>
+            <section class="c s4">
+                <h2>Почему отклонение</h2>
+                <div class="sub" id="ws"></div>
+                <div id="wf"></div>
+            </section>
+            <section class="c s3 ins mesh" id="ins"></section>
+            <section class="c s7">
+                <div class="hd2">
+                    <div>
+                        <h2>Показатели</h2>
+                        <div class="sub">Нажмите на строку, чтобы увидеть динамику и причины</div>
+                    </div><input class="srch gl" id="q" type="search" placeholder="Поиск" aria-label="Поиск показателя">
+                </div>
+                <div id="list"></div>
+            </section>
+            <section class="c s5">
+                <h2>Требуют решения</h2>
+                <div class="sub" id="ns"></div>
+                <div id="needs"></div>
+            </section>
+            <section class="c s5" id="fm">
+                <h2>Решение по отклонению</h2>
+                <div class="sub" id="fs"></div>
+                <div class="f2">
+                    <div class="fld"><label>Действие</label>
+                        <div class="sel" id="ac"></div>
+                    </div>
+                    <div class="fld"><label>Ответственный</label>
+                        <div class="sel" id="ow"></div>
+                    </div>
+                    <div class="fld"><label>Срок</label>
+                        <div class="sel up" id="dl"></div>
+                    </div>
+                    <div class="fld"><label>Ожидаемый эффект</label><input class="in gl" type="text" id="ef"
+                            placeholder="Например: просрочка до 8%"></div>
+                </div>
+                <button class="gl dk" id="sv" style="width:100%">Зафиксировать решение →</button>
+            </section>
+            <section class="c s7" id="lg">
+                <h2>Журнал решений</h2>
+                <div class="sub">Нажмите на статус, чтобы перевести решение дальше</div>
+                <div id="log">
+                    <div class="empty">Пока нет решений.</div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script>
+        var S = [["CRM / Битрикс24", "Клиенты · сделки · задачи", "ok", "Синхронизировано"], ["Поддержка / омниканал", "Обращения · SLA · качество", "ok", "Синхронизировано"], ["ERP / производство", "Заказ · очередь · выпуск", "wn", "Задержка 12 мин"], ["1С / финансы", "Статусы оплат и затрат", "ok", "Синхронизировано"], ["HR / персонал", "Штат · смены · нагрузка", "wn", "Обновлено вчера"]];
+        var D = [[0, "CRM / Битрикс24"], [1, "Поддержка / омниканал"], [2, "ERP / производство"], [3, "1С / финансы"], [4, "HR / персонал"]];
+        var K = [
+            ["f1", "f", "Выполнение плана выручки", 94, "%", 100, 0, 3, [101, 99, 98, 97, 96, 95, 95, 94], [["Отмены после просрочки", 46, 2, "ERP: 63 заказа отменены после срыва срока, пик — в понедельник."], ["Падение повторных покупок", 34, 0, "CRM: повторные сделки −9% к плану по B2C-сегменту."], ["Скидки-компенсации", 20, 3, "1С: 12% заказов закрыто со скидкой за задержку."]]],
+            ["f2", "f", "Оплаты вовремя", 94, "%", 92, 0, 3, [88, 89, 90, 91, 92, 93, 93, 94], [["Оплата после выпуска", 44, 3, "1С: 31% счетов оплачены только после готовности тиража."], ["Споры по срокам", 36, 1, "Поддержка: половина споров по оплате связана с задержкой."], ["Ошибки в реквизитах", 20, 0, "CRM: 14 сделок с неполной карточкой клиента."]]],
+            ["f3", "f", "Затраты к плану", 107, "%", 100, 1, 3, [99, 100, 101, 103, 104, 105, 106, 107], [["Перепечатка брака", 52, 2, "ERP: перепечатка 6,5% тиражей вместо нормы 3%."], ["Сверхурочные смены", 30, 4, "HR: переработки +18% в вечерней смене."], ["Срочные закупки бумаги", 18, 2, "ERP: дефицит фотобумаги на 2 из 5 площадок."]]],
+            ["c1", "c", "Конверсия сделок", 31, "%", 34, 0, 0, [35, 35, 34, 34, 33, 32, 32, 31], [["Долгие сроки в предложении", 48, 2, "CRM: 22 сделки потеряны на этапе «сроки»."], ["Медленный ответ на запрос", 32, 1, "Поддержка: первый ответ в среднем 41 мин при цели 15."], ["Конкуренты по цене", 20, 0, "CRM: причина отказа «цена» — 20% потерь."]]],
+            ["c2", "c", "SLA ответа", 87, "%", 95, 0, 1, [96, 95, 95, 93, 91, 90, 88, 87], [["Всплеск обращений о статусе", 51, 2, "Омниканал: «где мой заказ» — 38% всех тем за неделю."], ["Нехватка операторов", 33, 4, "HR: вакансий в поддержке 3 из 14."], ["Ручная маршрутизация", 16, 1, "Поддержка: 17% обращений перенаправлены вручную."]]],
+            ["c3", "c", "NPS", 62, "", 60, 0, 1, [54, 56, 57, 58, 59, 60, 61, 62], [["Задержка доставки", 57, 2, "ERP: 14% заказов доставлены позже обещанного срока."], ["Качество ответа", 25, 1, "Поддержка: повторные обращения по одному вопросу 19%."], ["Качество печати", 18, 2, "ERP: рекламации по цвету — 3,1% тиражей."]]],
+            ["p1", "p", "Заказы с просрочкой", 14, "%", 8, 1, 2, [7, 8, 8, 9, 11, 12, 13, 14], [["Очередь на модерации макетов", 41, 2, "ERP: 38 заказов в статусе «модерация» дольше 6 часов."], ["Нехватка печатников вечером", 27, 4, "HR: укомплектованность вечерней смены 71%."], ["Дефицит расходников", 18, 2, "ERP: бумага 10×15 — остаток на 1,5 дня."], ["Перепечатка брака", 14, 2, "ERP: 22 перепечатки за неделю."]]],
+            ["p2", "p", "Загрузка мощностей", 91, "%", 85, 1, 2, [80, 82, 84, 86, 88, 89, 90, 91], [["Пик заказов к 13.11", 49, 0, "CRM: рост входящих сделок +24% за 5 дней."], ["Простои оборудования", 31, 2, "ERP: 2 принтера на обслуживании 9 часов."], ["Нет резервной смены", 20, 4, "HR: резервный график не утверждён."]]],
+            ["p3", "p", "Срок до доставки", 3.4, "дн", 2.8, 1, 2, [2.7, 2.8, 2.8, 2.9, 3, 3.1, 3.3, 3.4], [["Ожидание в очереди", 45, 2, "ERP: среднее время в очереди 19 часов."], ["Передача в доставку", 35, 2, "ERP: 28 заказов ждали курьера более 4 часов."], ["Согласование макета", 20, 1, "Поддержка: 31% макетов уходят на 2-ю правку."]]],
+            ["h1", "h", "Укомплектованность смен", 82, "%", 95, 0, 4, [96, 95, 93, 90, 88, 86, 84, 82], [["Открытые вакансии печатников", 54, 4, "HR: 6 открытых вакансий, срок закрытия 34 дня."], ["Больничные и отпуска", 28, 4, "HR: отсутствует 9% штата вечерней смены."], ["Новички на обучении", 18, 4, "HR: 4 сотрудника ещё не допущены к станкам."]]],
+            ["h2", "h", "Текучесть", 11, "%", 8, 1, 4, [7, 7, 8, 8, 9, 9, 10, 11], [["Высокая нагрузка", 47, 4, "HR: переработки в вечерней смене +18%."], ["Уровень оплаты", 31, 3, "1С: премии за смену ниже рынка (индекс 0,92)."], ["Неясный рост", 22, 4, "HR: 3 из 5 уволившихся — до 6 месяцев стажа."]]],
+            ["h3", "h", "Часы переработок", 118, "%", 100, 1, 4, [96, 98, 100, 104, 108, 112, 115, 118], [["Просрочка и перепечатка", 58, 2, "ERP: перепечатка добавляет 140 часов в неделю."], ["Нехватка людей", 42, 4, "HR: недобор вечерней смены 29%."]]]];
+        K.push(["c4", "c", "Новые сделки к плану", 91, "%", 100, 0, 0, [100, 99, 98, 96, 95, 94, 92, 91], [["Долгие ответы клиентам", 42, 1, "Поддержка: первый ответ дольше 40 минут."], ["Пик перед 13.11 не обработан", 36, 2, "ERP: заказы откладываются до освобождения печати."], ["Слабый приток лидов", 22, 0, "CRM: новых обращений из рекламы −11%."]]],
+            ["c5", "c", "Повторные клиенты", 38, "%", 45, 0, 0, [46, 46, 45, 44, 42, 41, 39, 38], [["Задержки доставки", 52, 2, "ERP: 14% заказов доставлены позже срока."], ["Негативный опыт с поддержкой", 30, 1, "Поддержка: повторные обращения по одному вопросу 19%."], ["Нет напоминаний после заказа", 18, 0, "CRM: автозадача на повторную сделку только у 40% клиентов."]]],
+            ["c6", "c", "Повторные обращения", 19, "%", 12, 1, 1, [11, 11, 12, 13, 15, 16, 18, 19], [["Нет статуса заказа в ответе", 49, 2, "ERP: статус заказа не доходит до чата автоматически."], ["Вопросы без подтверждения", 31, 1, "Поддержка: 23% тем закрыты без ответа клиента."], ["Макеты без согласования", 20, 0, "CRM: 17% сделок без согласованного макета."]]]);
+        var LOGO = '<svg width="38" height="38" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Логотип Фотопринт"><circle cx="100" cy="100" r="100" fill="url(#fpLogoGrad)"/><line x1="23.8555" y1="146.623" x2="171.855" y2="52.6235" stroke-width="8" stroke="black"/><path d="M90 41.459C103.886 43.6032 115.351 53.0734 120.329 65.7959L106.375 74.6553C104.426 66.4653 98.0972 59.9732 90 57.791V85.0527L74 95.2109V58.4297C65.2414 61.6793 59 70.1107 59 80V104.733L43 114.892V80C43 61.2029 56.2984 45.5127 74 41.8223V33H90V41.459Z" fill="black"/><path d="M105.329 159.433C91.443 157.288 79.9781 147.818 75 135.096L88.9541 126.236C90.9033 134.426 97.2319 140.918 105.329 143.101V115.839L121.329 105.681V142.462C130.088 139.212 136.329 130.781 136.329 120.892V96.1582L152.329 86V120.892C152.329 139.689 139.031 155.379 121.329 159.069V167.892H105.329V159.433Z" fill="black"/><defs><linearGradient id="fpLogoGrad" x1="29.5" y1="29.5" x2="176" y2="176" gradientUnits="userSpaceOnUse"><stop stop-color="#FFEC65"/><stop offset="1" stop-color="#FFCE1B"/></linearGradient></defs></svg>';
+
+        var NM = { ok: "В норме", wn: "Внимание", bad: "Отклонение" }, CL = { ok: "var(--grn)", wn: "var(--yel)", bad: "var(--red)" }, SH = ["CRM", "Поддержка", "ERP", "1С", "HR"], OW = ["Директор по производству", "Руководитель поддержки", "Финансовый директор", "HR-директор", "Руководитель продаж"], OWN = [4, 1, 0, 2, 3];
+        var TI = { bad: '<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/>', wn: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>', ok: '<circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/>' };
+        var cur = K.filter(function (k) { return k[0] == "f2" })[0], ci = 0, fk = -1, flt = "", q = "", log = [], sels = {};
+        function $(i) { return document.getElementById(i) }
+        function gap(k) { return (k[3] - k[5]) / k[5] * (k[6] ? -1 : 1) }
+        function st(k) { var r = gap(k); return r >= 0 ? "ok" : r > -0.1 ? "wn" : "bad" }
+        function f(x) { return String(x).replace(".", ",") }
+        function un(k) { return k[4] == "%" ? " п.п." : (k[4] ? " " + k[4] : " п.") }
+        function pill(s, t) { return '<span class="pill"><i style="background:' + CL[s] + '"></i>' + t + '</span>' }
+        function spark(a) { var mn = Math.min.apply(0, a), mx = Math.max.apply(0, a), p = a.map(function (v, i) { return (i * 100 / (a.length - 1)).toFixed(1) + "," + (24 - (v - mn) / ((mx - mn) || 1) * 20).toFixed(1) }).join(" "); return '<svg viewBox="0 0 100 28" width="64" height="24" preserveAspectRatio="none"><polygon points="' + p + ' 100,28 0,28" fill="currentColor" opacity=".1"/><polyline fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="' + p + '"/></svg>' }
+        function chart(k, t) { var a = k[8], lo = Math.min(Math.min.apply(0, a), k[5]) * .7, hi = Math.max(Math.max.apply(0, a), k[5]) * 1.08, y = function (v) { return 158 - (v - lo) / (hi - lo) * 122 }, bw = 32, g = 10, c = CL[t], n = a.length, s = '<svg viewBox="0 0 360 200" width="100%" role="img" aria-label="Динамика за 8 периодов"><defs><linearGradient id="gp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--mut);stop-opacity:.4"/><stop offset="1" style="stop-color:var(--mut);stop-opacity:.05"/></linearGradient><linearGradient id="gb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:' + c + '"/><stop offset="1" style="stop-color:' + c + ';stop-opacity:.3"/></linearGradient><filter id="gl" x="-50%" y="-30%" width="200%" height="160%"><feGaussianBlur stdDeviation="7"/></filter></defs>';[0, 1, 2, 3].forEach(function (i) { var yy = 36 + i * 41; s += '<line x1="0" x2="360" y1="' + yy + '" y2="' + yy + '" style="stroke:var(--line)"/>' }); a.forEach(function (v, i) { var yy = y(v), l = i == n - 1, x = 4 + i * (bw + g), h = Math.max(8, 162 - yy); if (l) s += '<rect x="' + x + '" y="' + yy + '" width="' + bw + '" height="' + h + '" rx="16" style="fill:' + c + ';opacity:.4" filter="url(#gl)"/>'; s += '<rect x="' + x + '" y="' + yy + '" width="' + bw + '" height="' + h + '" rx="16" style="fill:url(#' + (l ? 'gb' : 'gp') + ')"/><text x="' + (x + bw / 2) + '" y="182" font-size="10" text-anchor="middle" style="fill:var(--mut)">Н' + (i + 1) + '</text>'; if (l) { var ty = Math.max(2, yy - 32); s += '<rect x="' + (x + bw / 2 - 31) + '" y="' + ty + '" width="62" height="24" rx="12" style="fill:var(--ink)"/><text x="' + (x + bw / 2) + '" y="' + (ty + 16) + '" font-size="11" font-weight="600" text-anchor="middle" style="fill:var(--bg)">' + f(v) + '</text>' } }); var py = y(k[5]); return s + '<line x1="0" x2="360" y1="' + py + '" y2="' + py + '" stroke-dasharray="5 5" style="stroke:var(--ink);opacity:.55"/><rect x="0" y="' + (py - 20) + '" width="62" height="18" rx="9" style="fill:var(--card);stroke:var(--line)"/><text x="31" y="' + (py - 8) + '" font-size="10" text-anchor="middle" style="fill:var(--mut)">план ' + f(k[5]) + '</text></svg>' }
+        function worst(ks) { return ks.slice().sort(function (a, b) { return gap(a) - gap(b) })[0] }
+        function nav() { $("lg0").innerHTML = LOGO + '<span>Фотопринт</span>'; var h = '<button class="tab" data-k="-1">Обзор</button>' + S.map(function (s, i) { return '<button class="tab" data-k="' + i + '" title="' + s[0] + ' · ' + s[3] + '">' + SH[i] + '</button>' }).join(""); $("tabs").innerHTML = h;[].forEach.call($("tabs").querySelectorAll(".tab"), function (b) { b.onclick = function () { setF(b.dataset.k) } }) }
+        function setF(k) { fk = +k; flt = ""; if (fk >= 0 && cur[7] != fk) { cur = worst(K.filter(function (x) { return x[7] == fk })); ci = 0 } render(); window.scrollTo({ top: 0, behavior: "smooth" }) }
+        function render() {
+            [].forEach.call($("tabs").querySelectorAll(".tab"), function (b) { b.classList.toggle("on", +b.dataset.k == fk) });
+            $("crumb").textContent = fk < 0 ? "Все системы" : "Система · " + SH[fk]; $("h1").textContent = fk < 0 ? "Управленческий контур" : S[fk][0]; $("sub").textContent = fk < 0 ? "Пять систем и " + K.length + " показателей. От агрегата к причине и решению по отклонению." : S[fk][1];
+            var base = K.filter(function (k) { return fk < 0 || k[7] == fk }), c = { ok: 0, wn: 0, bad: 0 }; base.forEach(function (k) { c[st(k)]++ });
+            var cards = [["", "Всего показателей", base.length, fk < 0 ? "из пяти систем" : "в этой системе"], ["bad", "Отклонения", c.bad, "требуют решения"], ["wn", "Внимание", c.wn, "следим за динамикой"], ["ok", "В норме", c.ok, "в пределах плана"]];
+            $("stats").innerHTML = cards.map(function (x, i) { return '<button class="sc' + (i == 0 ? " d" : "") + (x[0] && flt == x[0] ? " on" : "") + '" data-f="' + x[0] + '"><div class="sh"><span>' + x[1] + '</span><span class="ar">↗</span></div><div class="sn">' + x[2] + '</div><div class="ss">' + (x[0] ? '<i style="background:' + CL[x[0]] + '"></i>' : '') + x[3] + '</div></button>' }).join("");
+            [].forEach.call($("stats").querySelectorAll(".sc"), function (b) { b.onclick = function () { var v = b.dataset.f; flt = (!v || flt == v) ? "" : v; render() } });
+            var t = st(cur), cs = cur[9], cz = cs[ci], d = cur[3] - cur[5], dp = d / cur[5] * 100, u = un(cur), sg = d > 0 ? "+" : "−";
+            $("dn").textContent = cur[2]; $("ds").textContent = S[cur[7]][0]; $("dv").innerHTML = f(cur[3]) + '<small> ' + cur[4] + '</small>';
+            $("dp").innerHTML = pill(t, NM[t] + " · " + (dp > 0 ? "+" : "") + f(dp.toFixed(1)) + "% к плану");
+            $("ch").innerHTML = chart(cur, t) + '<div class="sm mut">8 периодов, пунктир — план, ось не с нуля.</div>';
+            $("ws").textContent = "Факт " + f(cur[3]) + u + " против плана " + f(cur[5]) + u + ": " + sg + f(Math.abs(d).toFixed(1)) + u;
+            var D2 = Math.abs(d), acc = 0, wf = '<div class="wr"><div class="wl"><span>План</span><b>' + f(cur[5]) + u + '</b></div><div class="tr"><i class="hatch" style="--k:var(--mut);left:0;width:100%"></i></div></div>';
+            cs.forEach(function (x, i) { var l = acc; acc += x[1]; wf += '<button class="wr' + (i == ci ? " on" : "") + '" data-i="' + i + '"><div class="wl"><span>' + x[0] + '</span><b>' + sg + f((D2 * x[1] / 100).toFixed(1)) + u + '</b></div><div class="tr"><i class="hatch" style="--k:' + CL[t] + ';left:' + l + '%;width:' + x[1] + '%"></i></div></button>' });
+            wf += '<div class="wr"><div class="wl"><span>Факт</span><b>' + f(cur[3]) + u + '</b></div><div class="tr"><i class="sol" style="--k:' + CL[t] + ';left:0;width:100%"></i></div></div>'; $("wf").innerHTML = wf;
+            [].forEach.call($("wf").querySelectorAll("button"), function (b) { b.onclick = function () { ci = +b.dataset.i; render() } });
+            var sy = []; cs.forEach(function (x) { if (sy.indexOf(x[2]) < 0) sy.push(x[2]) });
+            $("ins").innerHTML = '<div class="tp"><span class="pill gl">Причина ' + (ci + 1) + ' из ' + cs.length + '</span><span><button class="nb gl" data-s="-1" aria-label="Предыдущая">‹</button><button class="nb gl" data-s="1" aria-label="Следующая">›</button></span></div><div class="bn">' + cz[1] + '%</div><div class="tt">' + cz[0] + '</div><div class="ds">' + cz[3] + '</div><div class="chs">' + sy.map(function (i) { return '<span class="ch' + (i == cz[2] ? " on" : "") + '">' + SH[i] + '</span>' }).join("") + '</div><button class="go gl dk" id="gof">Оформить решение →</button>';
+            [].forEach.call($("ins").querySelectorAll(".nb"), function (b) { b.onclick = function () { ci = (ci + +b.dataset.s + cs.length) % cs.length; render() } }); $("gof").onclick = function () { $("fm").scrollIntoView({ block: "center" }) };
+            var h = ""; D.forEach(function (dd) { if (fk >= 0 && fk != dd[0]) return; var ks = base.filter(function (k) { return k[7] == dd[0] && (!flt || st(k) == flt) && (!q || k[2].toLowerCase().indexOf(q) > -1) }); if (!ks.length) return; h += '<div class="gr"><h3><span>' + dd[1] + '</span>' + pill(S[dd[0]][2], S[dd[0]][3]) + '</h3>' + ks.map(function (k) { var s = st(k); return '<button class="row2' + (k == cur ? " on" : "") + '" style="--k:' + CL[s] + '" data-id="' + k[0] + '"><i class="d"></i><span>' + k[2] + '<div class="p">план ' + f(k[5]) + (k[4] == "%" ? "%" : " " + k[4]) + '</div></span>' + spark(k[8]) + '<span class="v">' + f(k[3]) + '<small> ' + k[4] + '</small></span></button>' }).join("") + '</div>' });
+            $("list").innerHTML = h || '<div class="empty">Ничего не найдено</div>';
+            var nd = base.filter(function (k) { return st(k) != "ok" && (!q || k[2].toLowerCase().indexOf(q) > -1) }).sort(function (a, b) { return gap(a) - gap(b) }).slice(0, 6);
+            $("ns").textContent = nd.length ? "Самые сильные отклонения от плана" : "Все показатели в пределах плана";
+            $("needs").innerHTML = nd.map(function (k) { var s = st(k); return '<button class="nd" style="--k:' + CL[s] + '" data-id="' + k[0] + '"><span class="tile"><svg class="i" viewBox="0 0 24 24">' + TI[s] + '</svg></span><span style="flex:1"><b>' + k[2] + '</b><small>' + k[9][0][0] + ' · ' + SH[k[7]] + '</small></span><span class="mut">›</span></button>' }).join("");
+            [].forEach.call(document.querySelectorAll("#list .row2,#needs .nd"), function (b) { b.onclick = function () { cur = K.filter(function (k) { return k[0] == b.dataset.id })[0]; ci = 0; render(); window.scrollTo({ top: 0, behavior: "smooth" }) } });
+            $("fs").textContent = cur[2] + " · причина: " + cz[0]; sels.ow.set(OW[OWN[cz[2]]]); renderLog()
+        }
+        function renderLog() { var el = $("log"); if (!log.length) return; el.innerHTML = log.map(function (l, i) { var s = ["wn", "wn", "ok"][l.s]; return '<div class="li"><div><b style="font-weight:500">' + l.k + '</b> · ' + l.c + '<small>' + l.a + ' · ' + l.o + ' · срок: ' + l.d + (l.e ? ' · ' + l.e : '') + '</small></div><button class="gl" style="min-height:36px;padding:0 10px" data-i="' + i + '">' + pill(s, ["На согласовании", "В работе", "Выполнено"][l.s]) + '</button></div>' }).join("");[].forEach.call(el.querySelectorAll("button"), function (b) { b.onclick = function () { var l = log[+b.dataset.i]; l.s = (l.s + 1) % 3; renderLog() } }) }
+        function mk(id, opts, val) { var r = $(id); r.innerHTML = '<button type="button" class="gl sel-b"></button><ul class="sel-l" role="listbox"></ul>'; var b = r.children[0], l = r.children[1]; function set(v) { b.textContent = v; r.dataset.v = v;[].forEach.call(l.children, function (li) { li.setAttribute("aria-selected", li.textContent == v) }) } opts.forEach(function (o) { var li = document.createElement("li"); li.textContent = o; li.onclick = function (e) { e.stopPropagation(); set(o); r.classList.remove("open") }; l.appendChild(li) }); b.onclick = function (e) { e.stopPropagation();[].forEach.call(document.querySelectorAll(".sel.open"), function (x) { if (x !== r) x.classList.remove("open") }); r.classList.toggle("open") }; set(val); r.set = set; sels[id] = r }
+        document.addEventListener("click", function () { [].forEach.call(document.querySelectorAll(".sel.open"), function (x) { x.classList.remove("open") }) });
+        mk("ac", ["Перераспределить смены", "Добавить ресурс", "Изменить правила и SLA", "Эскалировать руководителю", "Наблюдать"], "Перераспределить смены"); mk("ow", OW, OW[0]); mk("dl", ["3 дня", "Неделя", "Две недели", "Месяц"], "Неделя");
+        $("th").onclick = function () { var r = document.documentElement, d = r.dataset.theme || (matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light"); r.dataset.theme = d == "dark" ? "light" : "dark" };
+        $("q").oninput = function () { q = this.value.toLowerCase().trim(); render() };
+        $("b1").onclick = function () { $("fm").scrollIntoView({ block: "center" }) }; $("b2").onclick = function () { $("lg").scrollIntoView({ block: "center" }) };
+        $("sv").onclick = function () { var e = $("ef"); log.unshift({ k: cur[2], c: cur[9][ci][0], a: sels.ac.dataset.v, o: sels.ow.dataset.v, d: sels.dl.dataset.v, e: e.value.trim(), s: 0 }); e.value = ""; renderLog() };
+        nav(); render();
+    </script>
+</body>
+
+</html>

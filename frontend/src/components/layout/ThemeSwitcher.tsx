@@ -2,6 +2,7 @@ import { useThemeStore, type ThemeId } from "../../store/theme";
 import { cn } from "../../lib/cn";
 
 const THEMES: { id: ThemeId; label: string; hint: string }[] = [
+  { id: "fotoprint", label: "Фотопринт", hint: "бренд-тема" },
   { id: "mission",  label: "ПУЛЬТ",    hint: "цех / телеметрия" },
   { id: "swiss",    label: "СВОДКА",   hint: "директор / отчёт" },
   { id: "investor", label: "ИНВЕСТОР", hint: "совет директоров" },
