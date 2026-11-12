@@ -1,0 +1,27 @@
+{
+  "e38b9014b1f0911b7e88c017df8db31975afd7b1c04b7b48071fa27ddc8699d9": {
+    "interpretation": "Узел fin_margin имеет маржу.",
+    "root_cause": "маржа",
+    "recommended_action": "проверить маржу"
+  },
+  "d8d2eef52d1c3ac8ed7f1c444fca4efd2e5093b64858cf36c826ed3f025d39fe": {
+    "interpretation": "Узел hr_operators_s3 имеет маржу.",
+    "root_cause": "маржа",
+    "recommended_action": "нанять операторов"
+  },
+  "21051c0a42aa790dbeccb7e42b316282c3534bca3992ba3a8665292af6686ad5": {
+    "interpretation": "Forecast: показатели маржа динамика.",
+    "root_cause": "маржа",
+    "recommended_action": "проверить маржу"
+  },
+  "eb0ef75882429d993482875ceea2683b767a06f823f764ca4f58ae83c1ffdf17": {
+    "interpretation": "Simulate main: решение снизить потери.",
+    "root_cause": "потери",
+    "recommended_action": "проверить маржу"
+  },
+  "e718ccccdce4449f6a83644ebac864f3e0ff68d2d0e8502655c2817b01ad1e30": {
+    "interpretation": "Simulate neg: проблема операторов.",
+    "root_cause": "проблема операторов",
+    "recommended_action": "проверить операторов"
+  }
+}

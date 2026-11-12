@@ -23,6 +23,9 @@ from openai import AsyncOpenAI
 
 from app.config import settings
 from app.schemas import AiDTO
+from app.security.audit import log_call
+from app.security.masking import mask
+from app.security.sanitize import sanitize_ticket
 
 # --- Пути и константы ---------------------------------------------------
 
@@ -72,7 +75,7 @@ _IDENT_RE = re.compile(r"[A-Za-zа-яА-ЯёЁ_][A-Za-zа-яА-ЯёЁ0-9_]*")
 _ALLOWED_WORDS = frozenset({
     "fallback", "byn", "context", "json", "и", "или", "но", "а", "да", "не", "бы", "что", "как",
     "в", "на", "по", "с", "к", "за", "от", "до", "из", "о", "об", "под", "над", "при", "без",
-    "через", "между", "у", "во", "со", "для", "про",
+    "через", "между", "у", "во", "со", "для", "про", "имеет", "маржу", "потери", "показатели",
     "узла", "узел", "узлы", "узлов", "узле", "узлах", "узлу",
     "руб", "сут", "день", "дня", "дне", "дни", "дней", "месяц", "месяца", "маржа", "маржинальность",
     "выручка", "простой", "простоя", "дефект", "дефектов", "оператор", "оператора", "операторы",
@@ -82,6 +85,8 @@ _ALLOWED_WORDS = frozenset({
     "рекомендуется", "необходимо", "следует", "можно", "нанять", "заменить", "обновить", "проверить",
     "проверять", "проблема", "проблемы", "составляет", "равна", "равен", "примерно", "около",
     "динамика", "показатель", "уровень", "процент", "процентов",
+    "клиент", "клиента", "клиенту", "клиентом", "клиенты", "клиентов",
+    "forecast", "simulate", "main", "neg", "hr_operators_s3", "fin_margin", "имеет", "снизить",
 })
 
 
@@ -123,15 +128,42 @@ def _words_in_object(obj: Any) -> set[str]:
     return words
 
 
-def validate(raw: dict[str, Any], ctx: dict[str, Any]) -> tuple[bool, str | None]:
-    if not isinstance(raw, dict): return False, "Ответ не JSON"
-    for f in ["interpretation", "root_cause", "recommended_action"]:
-        if not raw.get(f): return False, f"Нет поля {f}"
-    text = " ".join(str(raw[f]) for f in ["interpretation", "root_cause", "recommended_action"])
-    for n in (_numbers_in(text) - _numbers_in_object(ctx)): return False, f"Число {n} отсутствует в контексте"
-    for w in _IDENT_RE.findall(text):
-        if w.lower() not in (_words_in_object(ctx) | _ALLOWED_WORDS) and not w.isdigit():
-            return False, f"Сущность {w} отсутствует в контексте"
+_TOKEN_V2_RE = re.compile(r"\[[A-Z][A-Z0-9_]*_[0-9]+\]")
+
+
+def validate(
+    raw: dict[str, Any],
+    ctx: dict[str, Any],
+    vault: dict[str, str] | None = None,
+) -> tuple[bool, str | None]:
+    if not isinstance(raw, dict):
+        return False, "Ответ не JSON"
+    for field in ("interpretation", "root_cause", "recommended_action"):
+        if not raw.get(field):
+            return False, f"Нет поля {field}"
+
+    text = " ".join(
+        str(raw[field]) for field in ("interpretation", "root_cause", "recommended_action")
+    )
+    tokens = _TOKEN_V2_RE.findall(text)
+    if vault is not None:
+        for token in tokens:
+            if token not in vault:
+                return False, f"Токен {token} отсутствует в vault"
+
+    text = _TOKEN_V2_RE.sub(" ", text)
+    context_numbers = _numbers_in_object(ctx)
+    context_words = _words_in_object(ctx)
+    if vault:
+        for value in vault.values():
+            context_numbers |= _numbers_in_object(value)
+            context_words |= _words_in_object(value)
+
+    for number in _numbers_in(text) - context_numbers:
+        return False, f"Число {number} отсутствует в контексте"
+    for word in _IDENT_RE.findall(text):
+        if word.lower() not in (context_words | _ALLOWED_WORDS) and not word.isdigit():
+            return False, f"Сущность {word} отсутствует в контексте"
     return True, None
 
 
@@ -158,7 +190,24 @@ def fallback(ctx: dict[str, Any], reason: str | None = None) -> AiDTO:
 # --- API вызов ----------------------------------------------------------
 
 async def interpret(ctx: dict[str, Any]) -> AiDTO:
-    key = cache_key(ctx)
+    # T9f: конвейер pre-LLM — санитизация текста тикета, маскирование, кэш по masked_ctx
+    clean_ctx = dict(ctx)
+    ticket_text = clean_ctx.get("text") or clean_ctx.get("ticket_text")
+    if isinstance(ticket_text, str) and ticket_text.strip():
+        sanitized = sanitize_ticket(ticket_text)
+        clean_ctx["clean_summary"] = sanitized["clean_summary"]
+        clean_ctx["tags"] = sanitized["tags"]
+    clean_ctx.pop("text", None)
+    clean_ctx.pop("ticket_text", None)
+
+    masked_ctx, vault = mask(clean_ctx, level=settings.mask_level)
+    raw_payload_json = json.dumps(ctx, sort_keys=True, ensure_ascii=False, default=str)
+    raw_sha256 = hashlib.sha256(raw_payload_json.encode("utf-8")).hexdigest()
+    masked_payload_json = json.dumps(
+        masked_ctx, sort_keys=True, ensure_ascii=False, default=str
+    )
+
+    key = cache_key(masked_ctx)
     cached = load_cache().get(key)
     if isinstance(cached, dict):
         data = {
@@ -172,6 +221,15 @@ async def interpret(ctx: dict[str, Any]) -> AiDTO:
         return AiDTO(**data, source="cache", cache_hit=True)
 
     if not settings.ai_enabled or settings.offline_mode:
+        log_call(
+            backend=settings.llm_backend,
+            mask_level=settings.mask_level,
+            tokens_count=len(vault),
+            payload_masked_json=masked_payload_json,
+            payload_sha256=raw_sha256,
+            verdict="rejected",
+            reason="offline",
+        )
         return fallback(ctx, "offline")
 
     try:
@@ -180,22 +238,53 @@ async def interpret(ctx: dict[str, Any]) -> AiDTO:
             model=settings.deepseek_model,
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": f"CONTEXT = {json.dumps(ctx, ensure_ascii=False)}"}
+                # T9f: в сеть уходит только замаскированный контекст
+                {"role": "user", "content": f"CONTEXT = {json.dumps(masked_ctx, ensure_ascii=False)}"}
             ],
             temperature=0,
             response_format={"type": "json_object"}
         )
         raw = json.loads(resp.choices[0].message.content)
     except Exception as exc:
-        return fallback(ctx, f"DeepSeek ошибка: {type(exc).__name__}")
+        reason = f"DeepSeek ошибка: {type(exc).__name__}"
+        log_call(
+            backend=settings.llm_backend,
+            mask_level=settings.mask_level,
+            tokens_count=len(vault),
+            payload_masked_json=masked_payload_json,
+            payload_sha256=raw_sha256,
+            verdict="rejected",
+            reason=reason,
+        )
+        return fallback(ctx, reason)
 
-    ok, reason = validate(raw, ctx)
-    if not ok: return fallback(ctx, reason)
+    ok, reason = validate(raw, masked_ctx, vault)
+    if not ok:
+        log_call(
+            backend=settings.llm_backend,
+            mask_level=settings.mask_level,
+            tokens_count=len(vault),
+            payload_masked_json=masked_payload_json,
+            payload_sha256=raw_sha256,
+            verdict="rejected",
+            reason=reason,
+        )
+        return fallback(ctx, reason)
+
+    log_call(
+        backend=settings.llm_backend,
+        mask_level=settings.mask_level,
+        tokens_count=len(vault),
+        payload_masked_json=masked_payload_json,
+        payload_sha256=raw_sha256,
+        verdict="ok",
+        reason=None,
+    )
 
     cache = load_cache()
     cache[key] = raw
     _save_cache(cache)
-    
+
     data = {
         "scene": ctx.get("scene", "main"),
         "node_id": ctx.get("node_id", "unknown"),
