@@ -1,84 +1,50 @@
 import { motion } from "framer-motion";
 import { staggerList, fadeIn, useMotionReduced } from "../../lib/motion";
+import type { WhyDeviationVM } from "../../lib/adapters";
 
-/**
- * Тип для причины отклонения
- */
-type DeviationCause = {
-  id: string;
-  name: string;
-  impact: number; // влияние в процентных пунктах (п.п.)
-  domain: string; // домен: ERP, HR, Поддержка и т.д.
-};
-
-/**
- * Тип для waterfall данных
- */
-type WaterfallData = {
-  plan: number; // плановое значение
-  fact: number; // фактическое значение
-  causes: DeviationCause[]; // причины отклонения
-};
-
-/**
- * Пропсы для WhyDeviation
- */
 type WhyDeviationProps = {
-  data: WaterfallData;
+  data: WhyDeviationVM;
 };
 
-/**
- * WhyDeviation — waterfall диаграмма "Почему отклонение".
- * Показывает: план → причины → факт.
- * Бары с подписями п.п.
- */
 export function WhyDeviation({ data }: WhyDeviationProps) {
   const reduced = useMotionReduced();
+  const { plan, fact, causes, unit } = data;
 
-  const { plan, fact, causes } = data;
-  const deviation = fact - plan;
+  // Если данных нет — показываем пустое состояние
+  if (fact === undefined || causes.length === 0) {
+    return (
+      <div className="glass-card" style={{ padding: "2rem" }}>
+        <h3 style={{ fontSize: "1.25rem", fontWeight: 600, color: "var(--text)", marginBottom: "1rem" }}>
+          Почему отклонение
+        </h3>
+        <p style={{ color: "var(--muted)", fontSize: "0.875rem" }}>
+          Данные цепочки не загружены. Выберите KPI для анализа.
+        </p>
+      </div>
+    );
+  }
 
-  // Вычисляем максимальное значение для нормализации высоты баров
-  const allValues = [plan, fact, ...causes.map((c) => Math.abs(c.impact))];
-  const maxValue = Math.max(...allValues);
-
-  // Определяем тип бара
-  const getBarType = (value: number, isPlanOrFact: boolean): string => {
-    if (isPlanOrFact) return "neutral";
-    return value >= 0 ? "positive" : "negative";
-  };
+  const deviation = plan !== undefined ? fact - plan : 0;
+  const allValues = [fact, ...(plan !== undefined ? [plan] : []), ...causes.map((c) => Math.abs(c.value))];
+  const maxValue = Math.max(...allValues, 1);
 
   return (
-    <motion.div
-      className="glass-card"
-      style={{ padding: "2rem" }}
-    >
-      {/* Заголовок */}
+    <div className="glass-card" style={{ padding: "2rem" }}>
       <h3 style={{ fontSize: "1.25rem", fontWeight: 600, color: "var(--text)", marginBottom: "1.5rem" }}>
         Почему отклонение
       </h3>
 
-      {/* Waterfall диаграмма */}
-      <motion.div
-        className="waterfall"
-        variants={reduced ? undefined : staggerList}
-        initial="hidden"
-        animate="show"
-      >
-        {/* План */}
-        <motion.div
-          className="waterfall-bar neutral"
-          style={{ height: `${(plan / maxValue) * 100}%` }}
-          variants={reduced ? undefined : fadeIn}
-        >
-          <div className="bar-value">{plan}</div>
-          <div className="bar-label">План</div>
-        </motion.div>
+      <motion.div className="waterfall" variants={reduced ? undefined : staggerList} initial="hidden" animate="show">
+        {plan !== undefined && (
+          <motion.div className="waterfall-bar neutral" style={{ height: `${(plan / maxValue) * 100}%` }} variants={reduced ? undefined : fadeIn}>
+            <div className="bar-value">{plan} {unit}</div>
+            <div className="bar-label">План</div>
+          </motion.div>
+        )}
 
-        {/* Причины отклонения */}
         {causes.map((cause, index) => {
-          const barType = getBarType(cause.impact, false);
-          const height = (Math.abs(cause.impact) / maxValue) * 100;
+          const height = (Math.abs(cause.value) / maxValue) * 100;
+          const barType = cause.value >= 0 ? "positive" : "negative";
 
           return (
             <motion.div
@@ -88,9 +54,8 @@ export function WhyDeviation({ data }: WhyDeviationProps) {
               variants={reduced ? undefined : fadeIn}
               custom={index}
             >
-              <div className="bar-value">
-                {cause.impact > 0 ? "+" : ""}
-                {cause.impact} п.п.
+              <div className="bar-value" style={{ fontSize: "0.7rem" }}>
+                {cause.value}
               </div>
               <div className="bar-label" style={{ fontSize: "0.65rem" }}>
                 {cause.name}
@@ -99,44 +64,20 @@ export function WhyDeviation({ data }: WhyDeviationProps) {
           );
         })}
 
-        {/* Факт */}
-        <motion.div
-          className="waterfall-bar neutral"
-          style={{ height: `${(fact / maxValue) * 100}%` }}
-          variants={reduced ? undefined : fadeIn}
-        >
-          <div className="bar-value">{fact}</div>
+        <motion.div className="waterfall-bar neutral" style={{ height: `${(fact / maxValue) * 100}%` }} variants={reduced ? undefined : fadeIn}>
+          <div className="bar-value">{fact} {unit}</div>
           <div className="bar-label">Факт</div>
         </motion.div>
       </motion.div>
 
-      {/* Итоговое отклонение */}
-      <div
-        style={{
-          marginTop: "2rem",
-          padding: "1rem",
-          background: "var(--panel-2)",
-          borderRadius: "var(--radius)",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <span style={{ color: "var(--muted)", fontSize: "0.875rem" }}>
-          Итоговое отклонение:
-        </span>
-        <span
-          style={{
-            fontSize: "1.25rem",
-            fontWeight: 700,
-            fontFamily: "var(--font-mono)",
-            color: deviation < 0 ? "var(--alert)" : "var(--ok)",
-          }}
-        >
-          {deviation > 0 ? "+" : ""}
-          {deviation} п.п.
-        </span>
-      </div>
-    </motion.div>
+      {plan !== undefined && (
+        <div style={{ marginTop: "2rem", padding: "1rem", background: "var(--panel-2)", borderRadius: "var(--radius)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ color: "var(--muted)", fontSize: "0.875rem" }}>Итоговое отклонение:</span>
+          <span style={{ fontSize: "1.25rem", fontWeight: 700, fontFamily: "var(--font-mono)", color: deviation < 0 ? "var(--alert)" : "var(--ok)" }}>
+            {deviation > 0 ? "+" : ""}{deviation} {unit}
+          </span>
+        </div>
+      )}
+    </div>
   );
 }

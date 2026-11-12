@@ -1,59 +1,24 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { expandCollapse, useMotionReduced } from "../../lib/motion";
+import type { TableKpi, ChainCause } from "../../lib/adapters";
 
-/**
- * Тип для причины в таблице
- */
-type TableCause = {
-  id: string;
-  name: string;
-  impact: number;
-  domain: string;
-};
-
-/**
- * Тип для KPI в таблице
- */
-type TableKpi = {
-  id: string;
-  name: string;
-  value: number;
-  unit: string;
-  status: "alert" | "warn" | "ok";
-  trend: number[]; // данные для MiniSpark
-  causes: TableCause[];
-};
-
-/**
- * Пропсы для IndicatorsTable
- */
 type IndicatorsTableProps = {
   kpis: TableKpi[];
 };
 
-/**
- * Статус-бейдж класс
- */
 const STATUS_CLASS: Record<TableKpi["status"], string> = {
-  alert: "badge-alert",
-  warn: "badge-warn",
-  ok: "badge-ok",
+  red: "badge-alert",
+  yellow: "badge-warn",
+  green: "badge-ok",
 };
 
-/**
- * Статус-лейбл
- */
 const STATUS_LABEL: Record<TableKpi["status"], string> = {
-  alert: "Отклонение",
-  warn: "Внимание",
-  ok: "Норма",
+  red: "Отклонение",
+  yellow: "Внимание",
+  green: "Норма",
 };
 
-/**
- * IndicatorsTable — таблица «Показатели».
- * Клик строки → expandCollapse (динамика MiniSpark + причины).
- */
 export function IndicatorsTable({ kpis }: IndicatorsTableProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const reduced = useMotionReduced();
@@ -72,19 +37,10 @@ export function IndicatorsTable({ kpis }: IndicatorsTableProps) {
 
   return (
     <div className="glass-card" style={{ padding: "1.5rem" }}>
-      {/* Заголовок */}
-      <h3
-        style={{
-          fontSize: "1.25rem",
-          fontWeight: 600,
-          color: "var(--text)",
-          marginBottom: "1rem",
-        }}
-      >
+      <h3 style={{ fontSize: "1.25rem", fontWeight: 600, color: "var(--text)", marginBottom: "1rem" }}>
         Показатели
       </h3>
 
-      {/* Таблица */}
       <table className="indicators-table">
         <thead>
           <tr>
@@ -107,12 +63,7 @@ export function IndicatorsTable({ kpis }: IndicatorsTableProps) {
                 whileHover={!reduced ? { backgroundColor: "var(--panel-2)" } : undefined}
               >
                 <td style={{ fontWeight: 500 }}>{kpi.name}</td>
-                <td
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    fontWeight: 600,
-                  }}
-                >
+                <td style={{ fontFamily: "var(--font-mono)", fontWeight: 600 }}>
                   {kpi.value.toLocaleString("ru-RU")} {kpi.unit}
                 </td>
                 <td>
@@ -121,32 +72,32 @@ export function IndicatorsTable({ kpis }: IndicatorsTableProps) {
                   </span>
                 </td>
                 <td>
-                  {/* MiniSpark — мини-график тренда */}
-                  <svg
-                    width="80"
-                    height="24"
-                    viewBox="0 0 80 24"
-                    style={{ display: "block" }}
-                  >
-                    <polyline
-                      points={kpi.trend
-                        .map((val, i) => {
-                          const x = (i / (kpi.trend.length - 1)) * 80;
-                          const y = 24 - (val / Math.max(...kpi.trend)) * 24;
-                          return `${x},${y}`;
-                        })
-                        .join(" ")}
-                      fill="none"
-                      stroke={
-                        kpi.status === "alert"
-                          ? "var(--alert)"
-                          : kpi.status === "warn"
-                          ? "var(--warn)"
-                          : "var(--ok)"
-                      }
-                      strokeWidth="1.5"
-                    />
-                  </svg>
+                  {/* MiniSpark — показываем только если trend загружен */}
+                  {kpi.trend && kpi.trend.length > 0 ? (
+                    <svg width="80" height="24" viewBox="0 0 80 24" style={{ display: "block" }}>
+                      <polyline
+                        points={kpi.trend
+                          .map((val, i) => {
+                            const max = Math.max(...kpi.trend!);
+                            const x = (i / (kpi.trend!.length - 1)) * 80;
+                            const y = 24 - (val / max) * 24;
+                            return `${x},${y}`;
+                          })
+                          .join(" ")}
+                        fill="none"
+                        stroke={
+                          kpi.status === "red"
+                            ? "var(--alert)"
+                            : kpi.status === "yellow"
+                            ? "var(--warn)"
+                            : "var(--ok)"
+                        }
+                        strokeWidth="1.5"
+                      />
+                    </svg>
+                  ) : (
+                    <span style={{ color: "var(--muted)", fontSize: "0.75rem" }}>—</span>
+                  )}
                 </td>
               </motion.tr>
             );
@@ -154,7 +105,6 @@ export function IndicatorsTable({ kpis }: IndicatorsTableProps) {
         </tbody>
       </table>
 
-      {/* Раскрытые детали (accordion) */}
       <AnimatePresence>
         {kpis.map((kpi) => {
           const isExpanded = expandedId === kpi.id;
@@ -169,113 +119,47 @@ export function IndicatorsTable({ kpis }: IndicatorsTableProps) {
               style={{ overflow: "hidden" }}
             >
               {isExpanded && (
-                <div
-                  style={{
-                    padding: "1.5rem",
-                    background: "var(--panel-2)",
-                    borderRadius: "var(--radius)",
-                    marginTop: "0.5rem",
-                  }}
-                >
-                  {/* Динамика */}
-                  <h4
-                    style={{
-                      fontSize: "1rem",
-                      fontWeight: 600,
-                      color: "var(--text)",
-                      marginBottom: "1rem",
-                    }}
-                  >
+                <div style={{ padding: "1.5rem", background: "var(--panel-2)", borderRadius: "var(--radius)", marginTop: "0.5rem" }}>
+                  <h4 style={{ fontSize: "1rem", fontWeight: 600, color: "var(--text)", marginBottom: "1rem" }}>
                     Динамика показателя
                   </h4>
 
-                  {/* Большой график тренда */}
-                  <svg
-                    width="100%"
-                    height="120"
-                    viewBox="0 0 400 120"
-                    style={{ display: "block", marginBottom: "1.5rem" }}
-                  >
-                    <polyline
-                      points={kpi.trend
-                        .map((val, i) => {
-                          const x = (i / (kpi.trend.length - 1)) * 400;
-                          const y = 120 - (val / Math.max(...kpi.trend)) * 120;
-                          return `${x},${y}`;
-                        })
-                        .join(" ")}
-                      fill="none"
-                      stroke={
-                        kpi.status === "alert"
-                          ? "var(--alert)"
-                          : kpi.status === "warn"
-                          ? "var(--warn)"
-                          : "var(--ok)"
-                      }
-                      strokeWidth="2"
-                    />
-                  </svg>
+                  {kpi.trend && kpi.trend.length > 0 ? (
+                    <svg width="100%" height="120" viewBox="0 0 400 120" style={{ display: "block", marginBottom: "1.5rem" }}>
+                      <polyline
+                        points={kpi.trend
+                          .map((val, i) => {
+                            const max = Math.max(...kpi.trend!);
+                            const x = (i / (kpi.trend!.length - 1)) * 400;
+                            const y = 120 - (val / max) * 120;
+                            return `${x},${y}`;
+                          })
+                          .join(" ")}
+                        fill="none"
+                        stroke={
+                          kpi.status === "red"
+                            ? "var(--alert)"
+                            : kpi.status === "yellow"
+                            ? "var(--warn)"
+                            : "var(--ok)"
+                        }
+                        strokeWidth="2"
+                      />
+                    </svg>
+                  ) : (
+                    <p style={{ color: "var(--muted)", fontSize: "0.875rem" }}>
+                      Данные динамики не загружены
+                    </p>
+                  )}
 
-                  {/* Причины */}
-                  {kpi.causes.length > 0 && (
+                  {kpi.causes && kpi.causes.length > 0 && (
                     <>
-                      <h4
-                        style={{
-                          fontSize: "1rem",
-                          fontWeight: 600,
-                          color: "var(--text)",
-                          marginBottom: "0.75rem",
-                        }}
-                      >
+                      <h4 style={{ fontSize: "1rem", fontWeight: 600, color: "var(--text)", marginBottom: "0.75rem" }}>
                         Причины отклонения
                       </h4>
                       <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                         {kpi.causes.map((cause) => (
-                          <div
-                            key={cause.id}
-                            style={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              alignItems: "center",
-                              padding: "0.75rem",
-                              background: "var(--panel)",
-                              borderRadius: "var(--radius)",
-                              border: "1px solid var(--hair)",
-                            }}
-                          >
-                            <div>
-                              <div
-                                style={{
-                                  fontWeight: 500,
-                                  color: "var(--text)",
-                                  fontSize: "0.875rem",
-                                }}
-                              >
-                                {cause.name}
-                              </div>
-                              <div
-                                style={{
-                                  fontSize: "0.75rem",
-                                  color: "var(--muted)",
-                                  marginTop: "0.25rem",
-                                }}
-                              >
-                                {cause.domain}
-                              </div>
-                            </div>
-                            <div
-                              style={{
-                                fontFamily: "var(--font-mono)",
-                                fontWeight: 600,
-                                fontSize: "0.875rem",
-                                color:
-                                  cause.impact < 0 ? "var(--alert)" : "var(--ok)",
-                              }}
-                            >
-                              {cause.impact > 0 ? "+" : ""}
-                              {cause.impact}%
-                            </div>
-                          </div>
+                          <CauseRow key={cause.id} cause={cause} />
                         ))}
                       </div>
                     </>
@@ -286,6 +170,20 @@ export function IndicatorsTable({ kpis }: IndicatorsTableProps) {
           );
         })}
       </AnimatePresence>
+    </div>
+  );
+}
+
+function CauseRow({ cause }: { cause: ChainCause }) {
+  return (
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.75rem", background: "var(--panel)", borderRadius: "var(--radius)", border: "1px solid var(--hair)" }}>
+      <div>
+        <div style={{ fontWeight: 500, color: "var(--text)", fontSize: "0.875rem" }}>{cause.name}</div>
+        <div style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "0.25rem" }}>{cause.domain}</div>
+      </div>
+      <div style={{ fontFamily: "var(--font-mono)", fontWeight: 600, fontSize: "0.875rem", color: "var(--text)" }}>
+        {cause.value} {cause.unit}
+      </div>
     </div>
   );
 }

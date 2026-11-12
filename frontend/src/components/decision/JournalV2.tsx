@@ -1,72 +1,39 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useMotionReduced } from "../../lib/motion";
+import type { DecisionRecord, DecisionRecordStatus } from "../../lib/adapters";
 
-/**
- * Статусы решений
- */
-export type DecisionStatus = "draft" | "in_progress" | "done" | "rejected";
-
-/**
- * Тип записи журнала решений
- */
-export type DecisionRecord = {
-  id: string;
-  action: string;
-  responsible: string;
-  deadline: string;
-  status: DecisionStatus;
-  verdict?: string;
-};
-
-/**
- * Пропсы для JournalV2
- */
 type JournalV2Props = {
   decisions: DecisionRecord[];
-  onAdvance?: (id: string, newStatus: DecisionStatus) => void;
+  onAdvance?: (id: string, newStatus: DecisionRecordStatus) => void;
 };
 
-/**
- * Маппинг статусов на лейблы и классы бейджей
- */
-const STATUS_CONFIG: Record<DecisionStatus, { label: string; class: string }> = {
-  draft: { label: "Черновик", class: "badge-accent" },
-  in_progress: { label: "В работе", class: "badge-warn" },
-  done: { label: "Выполнено", class: "badge-ok" },
-  rejected: { label: "Отклонено", class: "badge-alert" },
+const STATUS_CONFIG: Record<DecisionRecordStatus, { label: string; class: string }> = {
+  pending: { label: "Ожидает", class: "badge-accent" },
+  effective: { label: "Эффективно", class: "badge-ok" },
+  ineffective: { label: "Неэффективно", class: "badge-alert" },
 };
 
-/**
- * Логика перевода статусов
- */
-const getNextStatus = (current: DecisionStatus): DecisionStatus => {
+const getNextStatus = (current: DecisionRecordStatus): DecisionRecordStatus => {
   switch (current) {
-    case "draft": return "in_progress";
-    case "in_progress": return "done";
-    case "done": return "draft"; // цикл для демо
-    case "rejected": return "draft";
-    default: return "draft";
+    case "pending": return "effective";
+    case "effective": return "ineffective";
+    case "ineffective": return "pending";
+    default: return "pending";
   }
 };
 
-/**
- * JournalV2 — «Журнал решений».
- * Клик статуса → перевод на следующий этап.
- */
 export function JournalV2({ decisions, onAdvance }: JournalV2Props) {
   const [records, setRecords] = useState<DecisionRecord[]>(decisions);
   const reduced = useMotionReduced();
 
-  const handleStatusClick = async (id: string, currentStatus: DecisionStatus) => {
+  const handleStatusClick = async (id: string, currentStatus: DecisionRecordStatus) => {
     const nextStatus = getNextStatus(currentStatus);
 
-    // Оптимистичное обновление UI
     setRecords((prev) =>
       prev.map((r) => (r.id === id ? { ...r, status: nextStatus } : r))
     );
 
-    // Имитация запроса к API (POST /api/simulate/advance)
     try {
       await fetch("/api/simulate/advance", {
         method: "POST",
@@ -74,8 +41,7 @@ export function JournalV2({ decisions, onAdvance }: JournalV2Props) {
         body: JSON.stringify({ id, status: nextStatus }),
       });
       onAdvance?.(id, nextStatus);
-    } catch (error) {
-      // Откат при ошибке сети
+    } catch {
       setRecords((prev) =>
         prev.map((r) => (r.id === id ? { ...r, status: currentStatus } : r))
       );
@@ -92,19 +58,10 @@ export function JournalV2({ decisions, onAdvance }: JournalV2Props) {
 
   return (
     <div className="glass-card" style={{ padding: "1.5rem" }}>
-      {/* Заголовок */}
-      <h3
-        style={{
-          fontSize: "1.25rem",
-          fontWeight: 600,
-          color: "var(--text)",
-          marginBottom: "1rem",
-        }}
-      >
+      <h3 style={{ fontSize: "1.25rem", fontWeight: 600, color: "var(--text)", marginBottom: "1rem" }}>
         Журнал решений
       </h3>
 
-      {/* Таблица */}
       <table className="journal-table">
         <thead>
           <tr>
@@ -125,24 +82,13 @@ export function JournalV2({ decisions, onAdvance }: JournalV2Props) {
                 whileHover={!reduced ? { backgroundColor: "var(--panel-2)" } : undefined}
                 transition={{ duration: 0.15 }}
               >
-                <td
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "0.8rem",
-                    color: "var(--muted)",
-                  }}
-                >
-                  {record.id}
+                <td style={{ fontFamily: "var(--font-mono)", fontSize: "0.8rem", color: "var(--muted)" }}>
+                  {record.jiraKey ?? record.id.slice(0, 8)}
                 </td>
                 <td style={{ fontWeight: 500 }}>{record.action}</td>
                 <td>{record.responsible}</td>
-                <td
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "0.875rem",
-                  }}
-                >
-                  {record.deadline}
+                <td style={{ fontFamily: "var(--font-mono)", fontSize: "0.875rem" }}>
+                  {record.deadline ?? "—"}
                 </td>
                 <td>
                   <span

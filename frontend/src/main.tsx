@@ -1,4 +1,5 @@
 import "./styles/theme.css";
+import "./styles/skin-fotoprint.css"; // ← ДОБАВИТЬ ЭТУ СТРОКУ
 import "./styles/themes/fotoprint.css";
 import React from "react";
 import ReactDOM from "react-dom/client";
