@@ -12,6 +12,7 @@ import type {
   DecisionSimulateRequest,
   ForecastDTO,
   NotificationDTO,
+  ScenarioId,
   SliceDTO,
   SimulationDTO,
   Snapshot,
@@ -19,6 +20,8 @@ import type {
   WhatIfDTO,
   WhatIfRequest,
 } from "./types";
+import { useUIStore } from "../store/ui";
+import { useDemoStore } from "../store/demo";
 
 export interface SliceParams {
   from: string;
@@ -37,8 +40,10 @@ function qs(params: Record<string, string | number | undefined>): string {
 
 export const queryKeys = {
   snapshot: (scenario: string) => ["snapshot", scenario] as const,
-  dashboard: (scenario: string) => ["dashboard", scenario] as const,
-  chain: (nodeId: string | null) => ["chain", nodeId] as const,
+  dashboard: (scenario: string, role?: string, dept?: string | null) =>
+    ["dashboard", scenario, role, dept] as const,
+  chain: (nodeId: string | null, role?: string, dept?: string | null) =>
+    ["chain", nodeId, role, dept] as const,
   slice: (p: SliceParams | null) => ["slice", p] as const,
   whatif: () => ["whatif"] as const,
   forecast: (scenario: string) => ["forecast", scenario] as const,
@@ -56,19 +61,29 @@ export function useSnapshot(scenario: string): UseQueryResult<Snapshot, Error> {
   });
 }
 
-export function useDashboard(scenario: string): UseQueryResult<DashboardDTO, Error> {
+export function useDashboard(scenario?: ScenarioId): UseQueryResult<DashboardDTO, Error> {
+  const storeScenario = useUIStore((s) => s.scenario);
+  const sc = (scenario ?? storeScenario) as string;
+  const role = useDemoStore((s) => s.role);
+  const dept = useDemoStore((s) => s.dept);
+
   return useQuery({
-    queryKey: queryKeys.dashboard(scenario),
-    queryFn: () => getJson<DashboardDTO>(`/api/dashboard${qs({ scenario })}`),
+    queryKey: queryKeys.dashboard(sc, role, dept),
+    queryFn: () => getJson<DashboardDTO>(`/api/dashboard${qs({ scenario: sc })}`),
     refetchInterval: 30_000,
   });
 }
 
-export function useChain(nodeId: string | null): UseQueryResult<ChainDTO, Error> {
+export function useChain(nodeId?: string | null): UseQueryResult<ChainDTO, Error> {
+  const storeNodeId = useUIStore((s) => s.selectedNodeId);
+  const id = nodeId ?? storeNodeId ?? "fin_margin";
+  const role = useDemoStore((s) => s.role);
+  const dept = useDemoStore((s) => s.dept);
+
   return useQuery({
-    queryKey: queryKeys.chain(nodeId),
-    queryFn: () => getJson<ChainDTO>(`/api/chain/${encodeURIComponent(nodeId as string)}`),
-    enabled: nodeId !== null,
+    queryKey: queryKeys.chain(id, role, dept),
+    queryFn: () => getJson<ChainDTO>(`/api/chain/${encodeURIComponent(id)}`),
+    enabled: id !== null,
   });
 }
 

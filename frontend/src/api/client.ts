@@ -1,4 +1,5 @@
 /** Fetch-клиент с нормализацией ошибок (§9.2 Readme.md). */
+import { useDemoStore } from "../store/demo";
 
 export class ApiError extends Error {
   readonly status: number;
@@ -20,7 +21,6 @@ export class ApiError extends Error {
 const NO_BODY = { method: "GET", headers: { "Content-Type": "application/json" } as HeadersInit };
 
 function buildUrl(path: string): string {
-  // API проксируется через vite: /api/* -> http://127.0.0.1:8000/api/*
   if (path.startsWith("http")) return path;
   return path.startsWith("/") ? path : `/${path}`;
 }
@@ -36,10 +36,47 @@ async function parseJson<T>(res: Response): Promise<T> {
 }
 
 function headersWith(extra?: HeadersInit): HeadersInit {
-  return { "Content-Type": "application/json", ...extra };
+  const state = useDemoStore.getState();
+  
+  // Создаём базовые заголовки
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  
+  // Добавляем заголовки RBAC только если они есть
+  if (state.role) {
+    headers["X-Demo-Role"] = state.role;
+  }
+  if (state.dept) {
+    headers["X-Demo-Dept"] = state.dept;
+  }
+  
+  // Добавляем дополнительные заголовки из extra
+  if (extra) {
+    // Преобразуем HeadersInit в Record<string, string>
+    if (Array.isArray(extra)) {
+      // Если это массив пар [key, value]
+      extra.forEach(([key, value]) => {
+        headers[key] = value;
+      });
+    } else if (extra instanceof Headers) {
+      // Если это объект Headers
+      extra.forEach((value, key) => {
+        headers[key] = value;
+      });
+    } else {
+      // Если это обычный объект
+      Object.entries(extra).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          headers[key] = String(value);
+        }
+      });
+    }
+  }
+  
+  return headers;
 }
 
-/** GET с автоматическим парсингом JSON и броском ApiError. */
 export async function getJson<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(buildUrl(path), { ...NO_BODY, ...init, headers: headersWith(init?.headers) });
   if (!res.ok) {
@@ -49,7 +86,6 @@ export async function getJson<T>(path: string, init?: RequestInit): Promise<T> {
   return parseJson<T>(res);
 }
 
-/** POST с JSON-телом. */
 export async function postJson<T>(path: string, body: unknown, init?: RequestInit): Promise<T> {
   const res = await fetch(buildUrl(path), {
     method: "POST",
