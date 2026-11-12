@@ -367,3 +367,24 @@ class MonitorCheckResultDTO(BaseModel):
     open_total: int
     incidents: list[IncidentDTO]
 
+
+# ──────────────────────────────────────────────────────────────────────
+# T9d: Журнал аудита ИИ-вызовов (PLAN-V2 §6.5) — additive
+# ──────────────────────────────────────────────────────────────────────
+
+class AuditDTO(BaseModel):
+    """Запись журнала аудита ИИ-вызова (таблица ai_audit).
+
+    `payload_masked_json` — JSON уже замаскированного payload (сырого текста нет),
+    `payload_sha256` — sha256 сырого payload для сверки (хэш передаёт вызывающий).
+    """
+    id: int
+    ts: datetime
+    backend: str
+    mask_level: str
+    tokens_count: int
+    payload_masked_json: str
+    payload_sha256: str
+    verdict: str
+    reason: str | None = None
+

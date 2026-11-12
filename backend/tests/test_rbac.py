@@ -174,11 +174,12 @@ def test_default_role_constant():
     assert DEFAULT_ROLE == "director"
 
 
-# ── Кейсы 10/11 задачи (аудит) — перенесены в T9d, эндпоинта нет ──────
+# ── Кейсы 10/11 задачи (аудит) — реализованы в T9d ─────────────────────
 # GET /api/security/audit: director 200 / production_head 403.
-# Проверяем фактическое поведение: эндпоинт отсутствует → 404 для обеих ролей,
-# реальная матрица ляжет в T9d поверх аудита T9a.
-@pytest.mark.parametrize("role", ["director", "production_head"])
-def test_audit_endpoint_absent_transferred_to_t9d(role: str):
+@pytest.mark.parametrize(
+    "role,expected",
+    [("director", 200), ("production_head", 403)],
+)
+def test_audit_endpoint_rbac(role: str, expected: int):
     resp = client.get("/api/security/audit", headers=get_auth_headers(role))
-    assert resp.status_code == 404  # роутер аудита ещё не смонтирован
+    assert resp.status_code == expected
