@@ -1,15 +1,19 @@
-/** TanStack Query-хуки + queryKeys-фабрика (§9, T4.1). */
+/** TanStack Query-хуки + queryKeys-фабрика (§9, T4.1, T9g: role/dept в ключах). */
 import { useMutation, useQuery, type UseMutationResult, type UseQueryResult } from "@tanstack/react-query";
 
+import { useDemoStore } from "../store/demo";
 import { getJson, postJson } from "./client";
 import type {
   AiDTO,
   AiInterpretRequest,
+  AuditDTO,
   ChainDTO,
   DashboardDTO,
   DecisionCreateRequest,
   DecisionDTO,
   DecisionSimulateRequest,
+  DemoDept,
+  DemoRole,
   ForecastDTO,
   NotificationDTO,
   SliceDTO,
@@ -35,6 +39,16 @@ function qs(params: Record<string, string | number | undefined>): string {
   return s ? `?${s}` : "";
 }
 
+/**
+ * Роль+отдел демо-RBAC. Входит во все роле-зависимые queryKey,
+ * чтобы смена роли не отдавала кэш другой роли (T9g, спека п.4).
+ */
+export function useRoleScope(): readonly [DemoRole, DemoDept | null] {
+  const role = useDemoStore((s) => s.role);
+  const dept = useDemoStore((s) => s.dept);
+  return [role, dept] as const;
+}
+
 export const queryKeys = {
   snapshot: (scenario: string) => ["snapshot", scenario] as const,
   dashboard: (scenario: string) => ["dashboard", scenario] as const,
@@ -47,6 +61,7 @@ export const queryKeys = {
   notifications: () => ["notifications"] as const,
   decision: (id: string) => ["decision", id] as const,
   ai: () => ["ai"] as const,
+  audit: () => ["security", "audit"] as const,
 } as const;
 
 export function useSnapshot(scenario: string): UseQueryResult<Snapshot, Error> {
@@ -57,24 +72,27 @@ export function useSnapshot(scenario: string): UseQueryResult<Snapshot, Error> {
 }
 
 export function useDashboard(scenario: string): UseQueryResult<DashboardDTO, Error> {
+  const scope = useRoleScope();
   return useQuery({
-    queryKey: queryKeys.dashboard(scenario),
+    queryKey: [...queryKeys.dashboard(scenario), ...scope],
     queryFn: () => getJson<DashboardDTO>(`/api/dashboard${qs({ scenario })}`),
     refetchInterval: 30_000,
   });
 }
 
 export function useChain(nodeId: string | null): UseQueryResult<ChainDTO, Error> {
+  const scope = useRoleScope();
   return useQuery({
-    queryKey: queryKeys.chain(nodeId),
+    queryKey: [...queryKeys.chain(nodeId), ...scope],
     queryFn: () => getJson<ChainDTO>(`/api/chain/${encodeURIComponent(nodeId as string)}`),
     enabled: nodeId !== null,
   });
 }
 
 export function useSlice(params: SliceParams | null): UseQueryResult<SliceDTO, Error> {
+  const scope = useRoleScope();
   return useQuery({
-    queryKey: queryKeys.slice(params),
+    queryKey: [...queryKeys.slice(params), ...scope],
     queryFn: () =>
       getJson<SliceDTO>(
         `/api/slice${qs({
@@ -96,31 +114,45 @@ export function useWhatIf(): UseMutationResult<WhatIfDTO, Error, WhatIfRequest> 
 }
 
 export function useForecast(scenario: string): UseQueryResult<ForecastDTO, Error> {
+  const scope = useRoleScope();
   return useQuery({
-    queryKey: queryKeys.forecast(scenario),
+    queryKey: [...queryKeys.forecast(scenario), ...scope],
     queryFn: () => getJson<ForecastDTO>(`/api/forecast${qs({ scenario })}`),
   });
 }
 
 export function useUnitEcon(): UseQueryResult<UnitEconDTO[], Error> {
+  const scope = useRoleScope();
   return useQuery({
-    queryKey: queryKeys.unitEcon(),
+    queryKey: [...queryKeys.unitEcon(), ...scope],
     queryFn: () => getJson<UnitEconDTO[]>("/api/unit-economics"),
   });
 }
 
 export function useDecisions(scenario?: string): UseQueryResult<DecisionDTO[], Error> {
+  const scope = useRoleScope();
   return useQuery({
-    queryKey: queryKeys.decisions(scenario),
+    queryKey: [...queryKeys.decisions(scenario), ...scope],
     queryFn: () =>
       getJson<DecisionDTO[]>(`/api/decisions${scenario ? qs({ scenario_id: scenario }) : ""}`),
   });
 }
 
 export function useNotifications(): UseQueryResult<NotificationDTO[], Error> {
+  const scope = useRoleScope();
   return useQuery({
-    queryKey: queryKeys.notifications(),
+    queryKey: [...queryKeys.notifications(), ...scope],
     queryFn: () => getJson<NotificationDTO[]>("/api/notifications"),
+  });
+}
+
+/** Журнал аудита вызовов LLM. Только для роли director (иначе backend вернёт 403). */
+export function useSecurityAudit(last: number): UseQueryResult<AuditDTO[], Error> {
+  const scope = useRoleScope();
+  return useQuery({
+    queryKey: [...queryKeys.audit(), last, ...scope],
+    queryFn: () => getJson<AuditDTO[]>(`/api/security/audit${qs({ last })}`),
+    retry: false,
   });
 }
 

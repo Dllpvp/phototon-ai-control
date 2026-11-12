@@ -25,3 +25,6 @@ __pycache__/
 *.pyc
 ProVidedText_lec1.md
 temp-readme2.md
+backend/app/state.db
+Fr/
+Fr_list.txt

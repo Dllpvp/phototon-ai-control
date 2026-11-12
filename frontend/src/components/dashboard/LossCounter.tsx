@@ -8,8 +8,8 @@ import { useEffect, useMemo, useState } from "react";
 import { formatByn } from "../../lib/format";
 
 interface LossCounterProps {
-  /** Потери за сутки (BYN/сут) — из DTO (node fin_loss_day). */
-  lossDay: number;
+  /** Потери за сутки (BYN/сут) — из DTO (node fin_loss_day). Если null/undefined — не рендеримся. */
+  lossDay: number | null | undefined;
   /** ISO-datetime старта счётчика (dashboard.loss_counter_started_at). */
   startedAt: string;
 }
@@ -60,6 +60,10 @@ export function LossCounter({ lossDay, startedAt }: LossCounterProps) {
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(timer);
   }, []);
+
+  if (lossDay === null || lossDay === undefined) {
+    return null;
+  }
 
   const elapsed = Number.isFinite(started) ? Math.max(0, (now - started) / 1000) : 0;
   const lost = (lossDay * elapsed) / SECONDS_PER_DAY;

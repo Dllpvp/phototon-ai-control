@@ -1,4 +1,5 @@
 /** Fetch-клиент с нормализацией ошибок (§9.2 Readme.md). */
+import { useDemoStore } from "../store/demo";
 
 export class ApiError extends Error {
   readonly status: number;
@@ -17,7 +18,7 @@ export class ApiError extends Error {
   }
 }
 
-const NO_BODY = { method: "GET", headers: { "Content-Type": "application/json" } as HeadersInit };
+const NO_BODY_BASE = { method: "GET" };
 
 function buildUrl(path: string): string {
   // API проксируется через vite: /api/* -> http://127.0.0.1:8000/api/*
@@ -35,13 +36,26 @@ async function parseJson<T>(res: Response): Promise<T> {
   }
 }
 
+/** Формирует заголовки, включая X-Demo-Role и X-Demo-Dept из стора. */
 function headersWith(extra?: HeadersInit): HeadersInit {
-  return { "Content-Type": "application/json", ...extra };
+  const { role, dept } = useDemoStore.getState();
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    "X-Demo-Role": role,
+  };
+  if (dept) {
+    headers["X-Demo-Dept"] = dept;
+  }
+  return { ...headers, ...extra };
 }
 
 /** GET с автоматическим парсингом JSON и броском ApiError. */
 export async function getJson<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(buildUrl(path), { ...NO_BODY, ...init, headers: headersWith(init?.headers) });
+  const res = await fetch(buildUrl(path), { 
+    ...NO_BODY_BASE, 
+    ...init, 
+    headers: headersWith(init?.headers) 
+  });
   if (!res.ok) {
     const body = await parseJson<{ detail?: string }>(res).catch(() => ({}));
     throw ApiError.fromResponse(res, body);

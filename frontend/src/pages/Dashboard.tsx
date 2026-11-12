@@ -94,6 +94,9 @@ export default function Dashboard() {
   const selectNode = useUIStore((state) => state.selectNode);
   const setOpenDecisionForm = useUIStore((state) => state.setOpenDecisionForm);
   const query = useDashboard(scenario);
+  const role = useDemoStore((state) => state.role);
+  const decisionLabel = role === "specialist" ? "Эскалировать руководителю" : "Оформить решение";
+
   return <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
     <HeroRow />
     <Section title="KPI" subtitle={`${query.data?.kpis.length ?? 0} метрик`} className="col-span-full lg:col-span-2"><KpiGrid query={query} /></Section>
@@ -102,7 +105,7 @@ export default function Dashboard() {
     <WhatIfSection />
     <ForecastSection />
     <Section title="Юнит-экономика" subtitle="маржа по SKU, %"><UnitEconTable /></Section>
-    <Section title="Журнал" subtitle="последние решения"><JournalTable /><div className="mt-3 flex justify-between"><button type="button" className="tag" style={{ color: "var(--accent)" }} onClick={() => setOpenDecisionForm(true)}>Оформить решение</button><Link className="mono text-xs" style={{ color: "var(--accent)" }} to="/journal">весь журнал →</Link></div></Section>
+    <Section title="Журнал" subtitle="последние решения"><JournalTable /><div className="mt-3 flex justify-between"><button type="button" className="tag" style={{ color: "var(--accent)" }} onClick={() => setOpenDecisionForm(true)}>{decisionLabel}</button><Link className="mono text-xs" style={{ color: "var(--accent)" }} to="/journal">весь журнал →</Link></div></Section>
     <DecisionForm />
     <SimulationModal />
   </div>;

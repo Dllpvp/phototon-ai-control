@@ -73,6 +73,36 @@ export interface AlertDTO {
   slice: SliceDescDTO;
 }
 
+export type DemoRole =
+  | "director"
+  | "department_head"
+  | "production_head"
+  | "hr_head"
+  | "finance_head"
+  | "support_head"
+  | "specialist";
+
+export type DemoDept =
+  | "production"
+  | "clients"
+  | "hr"
+  | "finance"
+  | "logistics"
+  | "procurement"
+  | "admin";
+
+export interface AuditDTO {
+  id: number;
+  ts: string;
+  backend: string;
+  mask_level: string;
+  tokens_count: number;
+  payload_masked_json: string;
+  payload_sha256: string;
+  verdict: string;
+  reason: string | null;
+}
+
 export interface KpiDTO {
   node_id: string;
   domain: Domain;

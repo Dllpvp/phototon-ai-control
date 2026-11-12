@@ -1,8 +1,12 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { Shield } from "lucide-react";
+import { useState } from "react";
 
 import { useDecisions, useSimulate } from "../../api/queries";
 import { useDemoStore } from "../../store/demo";
 import { useUIStore } from "../../store/ui";
+import { SecurityAuditModal } from "../security/SecurityAuditModal";
+import { RoleSwitcher } from "./RoleSwitcher";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 
 export function Header() {
@@ -14,6 +18,7 @@ export function Header() {
   const queryClient = useQueryClient();
   const { data: decisions } = useDecisions(currentScenario);
   const simulate = useSimulate();
+  const [auditOpen, setAuditOpen] = useState(false);
 
   const handlePlus14Days = () => {
     const hireDecisions = (decisions ?? []).filter((decision) => decision.type === "hire");
@@ -53,11 +58,23 @@ export function Header() {
         <span className="mono text-xs" style={{ color: "var(--muted)" }}>неделя 45 · 02.11.2026</span>
       </div>
       <div className="flex items-center gap-2">
+        <RoleSwitcher />
+        <button
+          type="button"
+          className="tag flex items-center gap-1"
+          style={{ color: "var(--accent)", cursor: "pointer" }}
+          onClick={() => setAuditOpen(true)}
+          title="Журнал аудита LLM (только директор)"
+        >
+          <Shield size={14} />
+          <span className="mono text-xs">Аудит</span>
+        </button>
         <ThemeSwitcher />
         <button type="button" className="tag" style={{ color: "var(--accent)", cursor: "pointer" }} onClick={handlePlus14Days}>⏩ +14 дней</button>
         <button type="button" className="tag" style={{ color: "var(--accent)", cursor: "pointer" }} onClick={handlePdfExport}>PDF</button>
         <button type="button" className="tag" style={{ color: "var(--accent)", cursor: "pointer" }} onClick={handleReset}>Сброс демо</button>
       </div>
+      <SecurityAuditModal open={auditOpen} onClose={() => setAuditOpen(false)} />
     </header>
   );
 }
