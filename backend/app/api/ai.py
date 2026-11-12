@@ -3,7 +3,7 @@ from app.integrations import ai_provider
 from app.schemas import AiDTO
 from app.config import settings
 
-router = APIRouter(prefix="/api/ai", tags=["ai"])
+router = APIRouter(prefix="/ai", tags=["ai"])
 
 @router.post("/interpret", response_model=AiDTO)
 async def interpret_chain(ctx: dict):
@@ -15,5 +15,5 @@ async def ai_health():
         "enabled": settings.ai_enabled,
         "model": settings.deepseek_model,
         "cache_size": len(ai_provider.load_cache()),
-        "provider": "deepseek",
+        "provider": "klinch-deepseek",
     }

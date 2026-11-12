@@ -18,6 +18,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "pypdf>=7.0.0",
     "pytest>=8.3",
     "pytest-asyncio>=0.25",
     "ruff>=0.7",

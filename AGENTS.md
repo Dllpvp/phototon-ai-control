@@ -10,6 +10,20 @@
 4. **РУССКИЙ ЯЗЫК В UI.** Весь интерфейс, тексты ошибок, названия метрик — на русском языке. Код (переменные, функции) — на английском. Валюта — BYN. Даты — в формате `ru-RU`.
 5. **НИКАКИХ TODO В КОДЕ.** Если что-то не доделано — создай задачу, но не оставляй `TODO` в файлах без ссылки на неё.
 6.  **Не выполняй более 8-10 вызовов инструментов подряд без ответа пользователю.** После каждого важного действия (создание/правка файла) давай краткий статус выполнения. Это нужно для работы в OpenCode.
+7. **ПЛАН-V2.md — дельта. Readme.md (v1) — база. При конфликте побеждает PLAN-V2.**
+8. **Якоря v1 неприкосновенны. Новое число на экране → ANCHORS_V2/CONSTANTS_V2 + тест.**
+9. **id узлов v1 не переименовывать. Ребрендинг = только display-имена и dims.**
+10. **Ни одного сырого ФИО/клиента/суммы во внешний LLM: только через security/masking.**
+11. **Демо работает без сети: эмуляторы локальные, помечены бейджем «эмулятор».**
+12. **Роли — демо-механика (заголовок X-Demo-Role), не строить настоящий auth.**
+13. **Новые зависимости (mcp) — только через ADR.**
+14. **Файл ≤ 300 строк. DTO — только в schemas.py. Фронт — без цифр и формул.**
+15. **Каждый новый эндпоинт: DTO → core/сервис → роутер → тест → хук фронта.**
+16. **Питч 3:00. Демо-прогон с таймером после каждого этапа.**
+17. **Фолбэки: OFFLINE_MODE=true, кэш, эмуляторы, MCP не нужен для демо.**
+18. **Не строить клиенты Треков 2 и 3 — только порты и заглушки-потребители.**
+19. **Не хардкодить числа во фронте; не логировать сырые payload; не передавать сырой текст тикетов в LLM.**
+20. **PLAN-V2 > Readme при конфликте доков.**
 ## 🏗 Архитектура и поток данных
 Строгая однонаправленная архитектура. Не перепрыгивай слои:
 `backend/data/*.json` + `backend/app/data/scenarios/*.json` ➔ `backend/app/core/` (чистая математика, без FastAPI) ➔ `backend/app/dependencies.py` и `backend/app/api/` (тонкие роутеры, DTO in/out) ➔ `frontend/` (только отрисовка).
@@ -18,7 +32,7 @@
 
 - **Backend:** Python 3.12+ (пин в `backend/pyproject.toml`, обоснование — `docs/adr/0001-python-version.md`), FastAPI, Pydantic v2 (+ pydantic-settings), uvicorn. Точные версии зависимостей — только в `backend/pyproject.toml` / `uv.lock`; не дублируй их здесь.
 - **Frontend:** React 19, TypeScript, Vite, Tailwind CSS v4, Recharts, Zustand, TanStack Query, framer-motion, lottie-web. Точные версии — только в `frontend/package.json`.
-- **Интеграции (ПЛАН, ещё не реализованы):** Telegram (httpx, только исходящие), Gemini (httpx, temperature=0, строгий JSON, кэш + фолбэк), PDF (reportlab). Каталоги `app/integrations/`, `app/report/` пока пустые; SQLite-журнал (`app/db.py`) тоже ещё не написан.
+- **Интеграции (ПЛАН, ещё не реализованы):** Telegram (httpx, только исходящие), DeepSeek flash через klinch cloud (OpenAI SDK, temperature=0, JSON response_format, кэш + фолбэк), PDF (reportlab). Каталоги `app/integrations/`, `app/report/` пока пустые; SQLite-журнал (`app/db.py`) тоже ещё не написан.
 
 ## 📌 Текущее состояние (проверено в репозитории)
 - **Ядро** (`backend/app/core/`) реализовано: `graph`, `loader` (JSON ➔ Pydantic, кэш `lru_cache`), `anchors`, `constants`, `interpolation`, `economics`, `impact`, `forecast`, `simulate`. `uv run pytest -q` ➔ всё зелёное (49 тестов).
@@ -38,17 +52,28 @@
 
 *Пример правильной работы:* Если тебе дали задачу "Сделать ползунок What-If", ты меняешь только `WhatIfSlider.tsx`, `api/queries.ts` и, возможно, `api/whatif.py`. Ты НЕ трогаешь `core/simulate.py`.
 
-## 🎨 UI/UX и Демо-надежность (Извлечено из jakubkrehel/skills)
-Поскольку это демо для жюри, визуальная часть и стабильность критичны:
-1. **State-Machine (Машина состояний):** Для каждого сложного компонента (например, `DecisionForm`, `KpiCard`, `WhatIfSlider`) ты обязан предусмотреть все состояния: `loading`, `error`, `empty`, `success`. На демо не должно быть пустых мигающих экранов. Используй моки/скелетоны, если данные грузятся.
-2. **Break (Стресс-тест UI):** Компоненты не должны ломаться при крайних значениях. Что если ползунок What-If на максимуме? Что если текст причины в 3 раза длиннее? Используй `truncate`, `min-w-0`, правильные flex-контейнеры.
-3. **Better-Colors (Тёмная тема):** Используй строго палитру из `Readme.md` (§10.1):
-   - Фон: `#0B0F14`, Панели: `#121821`
-   - Текст: `#E5EDF5`, Приглушенный: `#94A3B8`
-   - Алерт (Красный): `#EF4444` (только для отклонений!)
-   - Все финансовые цифры и KPI должны использовать класс `tabular-nums`, чтобы они не прыгали при обновлении (особенно в `LossCounter`).
-4. **Better-Layout:** Интерфейс должен выглядеть идеально на широком экране проектора. Используй семантические отступы Tailwind, избегай магических чисел в `style={{}}`.
+## 🎨 Темизация (4 темы × 2 режима) — обязательно
+Источник правды: Readme §10.1.1–10.1.5 + frontend/src/styles/theme.css.
+Контракт токенов фиксирован: --bg,--panel,--panel-2,--hair,--hair-strong,--text,--muted,
+--alert,--alert-soft,--warn,--warn-soft,--ok,--ok-soft,--accent,--accent-2,--paper,--paper-ink,--shadow,
+плюс --font-display,--font-mono,--font-serif,--radius,--shadow-strength.
 
+ЖЁСТКИЕ ПРАВИЛА:
+1. Любой цвет/радиус/тень/шрифт — ТОЛЬКО через var(--токен) или утилиты theme.css (.card,.tag,.memo,.slider,.zen-slider,.crop,.dotfield,.edge-live,.calm-stream,.osc,.live-dot,.breathe-dot).
+   ЗАПРЕЩЕНЫ hex-классы Tailwind по памяти: text-red-400, bg-slate-900, bg-gray-900, border-blue-*,
+   from-*/to-* градиенты, rounded-xl/2xl/3xl, shadow-lg/xl/2xl. Они ломают переключение тем = reject.
+2. Запрет-лист ФОРМЫ тема-зависим (Readme 10.1.1–10.1.4): mission → острые углы/hairline/без мягких теней;
+   swiss → radius 4px + жёсткая тень-отпечаток; investor → radius 10px + мягкие тени + воздух; zen → radius 20px + мягкие тени + природные тона.
+   НЕ смешивать признаки двух тем в одном компоненте. Если компонент должен выглядеть по-разному в темах —
+   различай через var(--radius)/var(--shadow-strength) или условный класс по useThemeStore().theme, НЕ через хардкод.
+3. framer-motion / CSS-анимации читают цвет ИЗ ТОКЕНА (var(--alert) и т.п.), НИКОГДА из строкового пропса
+   или захваченного в closure значения — иначе при смене темы анимация замрёт со старым цветом.
+4. Шрифты — только @fontsource (офлайн-сейф), НЕ <link> Google Fonts. Цифры/деньги/ID — класс .mono
+   (tabular-nums). Заголовки — .display. AiNote/служебка — .memo + .serif.
+5. Перед коммитом фронта прогнать grep по запрет-листу п.1 по frontend/src — результат пуст.
+   И отдельно: grep -rn "fonts.googleapis" frontend/index.html frontend/src — пусто.
+6. Новый компонент обязан рендериться корректно во ВСЕХ 8 комбинациях (прогнать ThemeSwitcher вручную
+   или snapshot-тест по матрице theme×mode). Компонент, красивый только в mission, = дефект.
 ## 🧪 Тестирование и Проверка
 - **Backend:** `uv run pytest -q` **из папки `backend/`** (иначе не подхватится `pyproject.toml`; настройки: `pythonpath=["."]`, `testpaths=["tests"]`). Тесты в `backend/tests/`: `test_anchors.py` (цифры бьются), `test_graph.py` (граф ацикличен), `test_impact.py` (BFS `delta`), `test_interpolation.py`, `test_forecast.py`, `test_simulate.py` (эффект решений: main=effective/22120, neg=ineffective). После правок в `core/` прогонять их обязательно.
 - **Frontend:** линтер — **oxlint** (`npm run lint`), НЕ eslint. Типы проверяет сборка: `npm run build` (`tsc -b && vite build`) — ошибок быть не должно. `tsconfig.json` — только project references (`tsconfig.app.json` + `tsconfig.node.json`).

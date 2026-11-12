@@ -1,0 +1,266 @@
+﻿"""Pydantic DTO РґР»СЏ API В«Р¤РѕС‚РѕРїСЂРёРЅС‚В·РљРѕРЅС‚СЂРѕР»СЊВ» (В§9 Readme.md).
+
+Р•РґРёРЅСЃС‚РІРµРЅРЅС‹Р№ РёСЃС‚РѕС‡РЅРёРє DTO РґР»СЏ Р±СЌРєРµРЅРґР°. Р¤СЂРѕРЅС‚РµРЅРґ Р·РµСЂРєР°Р»РёС‚ РёС… РІ
+`frontend/src/api/types.ts` (СЂСѓРєР°РјРё РёР»Рё С‡РµСЂРµР· openapi-typescript).
+"""
+
+from __future__ import annotations
+
+from datetime import date, datetime
+from decimal import Decimal
+from typing import Literal, Optional
+
+from pydantic import BaseModel, ConfigDict, Field
+
+
+# в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+# РћР±С‰РёРµ DTO (В§9.1)
+# в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+
+class Norm(BaseModel):
+    """РќРѕСЂРјР° РјРµС‚СЂРёРєРё: РЅРёР¶РЅСЏСЏ/РІРµСЂС…РЅСЏСЏ РіСЂР°РЅРёС†Р° + РµРґРёРЅРёС†Р° РёР·РјРµСЂРµРЅРёСЏ."""
+    lo: float | None = None
+    hi: float | None = None
+    unit: str
+
+
+class GraphNode(BaseModel):
+    """РЈР·РµР» РіСЂР°С„Р° РїСЂРёС‡РёРЅ РґР»СЏ API (В§9.1).
+    
+    РћС‚Р»РёС‡Р°РµС‚СЃСЏ РѕС‚ GraphNodePayload (loader.py) РЅР°Р»РёС‡РёРµРј `name`, `description`,
+    `literal` Рё РїРѕР»РµРј `norm` С‚РёРїР° `Norm` РІРјРµСЃС‚Рѕ СЃРїРёСЃРєР°.
+    """
+    id: str
+    domain: Literal["finance", "clients", "production", "hr", "quality", "season"]
+    name: str
+    unit: str
+    value: float
+    norm: Norm | None = None
+    status: Literal["red", "yellow", "green"]
+    cost_per_day: float | None = None
+    description: str | None = None
+    literal: bool = False
+
+
+class GraphEdge(BaseModel):
+    """Р РµР±СЂРѕ РіСЂР°С„Р° РїСЂРёС‡РёРЅ РґР»СЏ API (В§9.1).
+    
+    РџРѕР»Рµ `from_` СЃ Р°Р»РёР°СЃРѕРј `from` РґР»СЏ СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё СЃ JSON.
+    """
+    model_config = ConfigDict(populate_by_name=True)
+    
+    from_: str = Field(alias="from")
+    to: str
+    sign: Literal[-1, 1]
+    weight: float
+    curvature: float | None = None
+    lag_days: int = 0
+    note: str | None = None
+
+
+class Snapshot(BaseModel):
+    """РџРѕР»РЅС‹Р№ СЃРЅРёРјРѕРє СЃС†РµРЅР°СЂРёСЏ: СѓР·Р»С‹ + СЂС‘Р±СЂР° (В§9.1)."""
+    scenario_id: Literal["main", "neg", "peak"]
+    as_of: date
+    nodes: list[GraphNode]
+    edges: list[GraphEdge]
+
+
+# в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+# DTO РґР»СЏ СЌРЅРґРїРѕРёРЅС‚РѕРІ (В§9.3)
+# в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+
+class SliceDescDTO(BaseModel):
+    """РћРїРёСЃР°РЅРёРµ СЃСЂРµР·Р° РґР»СЏ РєСЂРѕСЃСЃ-С„РёР»СЊС‚СЂР°С†РёРё (РЅРµРґРµР»СЏ, Р»РёРЅРёСЏ, СЃРјРµРЅР°)."""
+    week: int
+    line: str | None = None
+    shift: int | None = None
+
+
+class AlertDTO(BaseModel):
+    """РђР»РµСЂС‚ РґР»СЏ РґР°С€Р±РѕСЂРґР° (В§9.3). РЎРѕСЂС‚РёСЂСѓСЋС‚СЃСЏ РїРѕ cost_per_day desc."""
+    node_id: str
+    title: str
+    delta_text: str          # "в€’10 Рї.Рї."
+    value_text: str          # "32.0%"
+    status: Literal["red", "yellow"]
+    cost_per_day: float      # 1840
+    week: int
+    slice: SliceDescDTO
+
+
+class KpiDTO(BaseModel):
+    """KPI РєР°СЂС‚РѕС‡РєР° РґР»СЏ СЃРµС‚РєРё 4Г—3 РЅР° РґР°С€Р±РѕСЂРґРµ (В§10.1)."""
+    node_id: str
+    domain: Literal["finance", "clients", "production", "hr", "quality", "season"]
+    name: str
+    unit: str
+    value: float
+    status: Literal["red", "yellow", "green"]
+    norm: Norm | None = None
+    cost_per_day: float | None = None
+
+
+class DashboardDTO(BaseModel):
+    """РћС‚РІРµС‚ GET /api/dashboard (В§9.3)."""
+    scenario_id: str
+    as_of: date
+    week: int
+    kpis: list[KpiDTO]                  # 12 СѓР·Р»РѕРІ, РїРѕ 3 РЅР° РґРѕРјРµРЅ
+    alerts: list[AlertDTO]              # СЃРѕСЂС‚РёСЂРѕРІР°РЅС‹: cost_per_day desc
+    loss_counter_started_at: datetime   # ISO; UI С‚РёРєР°РµС‚ РѕС‚ РЅРµРіРѕ
+    headline: str                       # "РњР°СЂР¶Р° в€’10 Рї.Рї., в€’1 840 BYN/СЃСѓС‚"
+    updated_at: datetime
+
+
+class WhatIfDeltaDTO(BaseModel):
+    """Р”РµР»СЊС‚Р° What-If РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ С‚РµРєСѓС‰РµРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ."""
+    d_downtime: float
+    d_sla: float
+    d_revenue: float
+    d_loss: float
+
+
+class RecommendedDTO(BaseModel):
+    """Р РµРєРѕРјРµРЅРґСѓРµРјРѕРµ СЂРµС€РµРЅРёРµ РЅР° РѕСЃРЅРѕРІРµ What-If."""
+    type: Literal["hire"]
+    operators: int
+    expected_effect_byn: float
+    expected_defect_rate: float
+    expected_downtime_h: float
+
+
+class WhatIfDTO(BaseModel):
+    """РћС‚РІРµС‚ POST /api/whatif (В§9.3). Р’СЃРµРіРґР° С‚РѕС‡РЅРѕ РѕС‚РІРµС‡Р°РµС‚ РЅР° 4/5/6 = С‡РёСЃР»Р° РїР»Р°РЅР°."""
+    ops: float
+    downtime_h: float
+    sla_orders: int
+    revenue_week: float
+    loss_day: float
+    vs_now: WhatIfDeltaDTO
+    recommended: RecommendedDTO
+    chain_preview: list[str]      # ids С†РµРїРѕС‡РєРё РІР»РёСЏРЅРёСЏ
+
+
+class ForecastDTO(BaseModel):
+    """РћС‚РІРµС‚ GET /api/forecast (В§9.3). РџРёРєРѕРІР°СЏ РєР°СЂС‚РѕС‡РєР° РЅРµРґРµР»Рё 47."""
+    week: int
+    seasonality_coeff: float
+    forecast_orders: int
+    capacity_orders: int
+    deficit: int
+    downtime_h: float
+    loss_day: float
+    recommended_action: str | None = None
+    downtime_h_after: float | None = None
+    loss_day_after: float | None = None
+
+
+class UnitEconDTO(BaseModel):
+    """РЎС‚СЂРѕРєР° С‚Р°Р±Р»РёС†С‹ СЋРЅРёС‚-СЌРєРѕРЅРѕРјРёРєРё (В§7.8, В§9.3). 5 SKU/РєР»РёРµРЅС‚РѕРІ."""
+    sku: str
+    price: float
+    paper: float
+    printing: float
+    binding: float
+    labor: float
+    defect: float
+    margin_pct: float
+
+
+class ChainNodeDTO(BaseModel):
+    """РЈР·РµР» РІ С†РµРїРѕС‡РєРµ drill-down (/api/chain)."""
+    node_id: str
+    name: str
+    domain: str
+    value: float
+    unit: str
+    status: Literal["red", "yellow", "green"]
+    cost_per_day: float | None = None
+    delta_from_parent: float | None = None  # РёР·РјРµРЅРµРЅРёРµ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ СЂРѕРґРёС‚РµР»СЏ
+
+
+class ChainDTO(BaseModel):
+    """РћС‚РІРµС‚ GET /api/chain/{node_id} (В§9.3).
+    
+    РСЃРїРѕР»СЊР·СѓРµС‚ path_hint РёР· graph.json РґР»СЏ fin_margin (target=hr_operators_s3).
+    Р’РѕР·РІСЂР°С‰Р°РµС‚ С†РµРїРѕС‡РєСѓ РґР»РёРЅРѕР№ 4, Р·Р°РєР°РЅС‡РёРІР°СЋС‰СѓСЋСЃСЏ РЅР° hr_operators_s3.
+    """
+    source: Literal["hint", "algorithm"]
+    chain: list[ChainNodeDTO]
+
+
+class SliceFactDTO(BaseModel):
+    """РћРґРёРЅ С„Р°РєС‚ РІ СЃСЂРµР·Рµ РїРѕ РґРЅСЏРј (/api/slice)."""
+    ts: date
+    domain: str
+    metric: str
+    value: float
+    dims: dict[str, str] = {}
+
+
+class SliceDTO(BaseModel):
+    """РћС‚РІРµС‚ GET /api/slice (В§9.3). РљСЂРѕСЃСЃ-С„РёР»СЊС‚СЂ: СЃРµСЂРёСЏ РїРѕ РґРЅСЏРј."""
+    from_: date = Field(alias="from")
+    to: date
+    line: str | None = None
+    shift: int | None = None
+    facts: list[SliceFactDTO]
+
+
+class SimulationDTO(BaseModel):
+    """Р РµР·СѓР»СЊС‚Р°С‚ СЃРёРјСѓР»СЏС†РёРё В«Р±С‹Р»Рѕ в†’ СЃС‚Р°Р»РѕВ» (+14 РґРЅРµР№) (В§7.7)."""
+    days: int
+    branch: Literal["main", "neg"]
+    effect_byn: float
+    verdict: Literal["effective", "ineffective"]
+    recommendation: str | None = None
+    compensating_cause: str | None = None
+    loss_day: float
+    defect_rate: float
+    downtime_h: float
+    final_snapshot: dict[str, dict[str, float]]  # node_id -> {value, status}
+
+
+# в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+# DTO РґР»СЏ Р±СѓРґСѓС‰РёС… СЌРЅРґРїРѕРёРЅС‚РѕРІ (decisions, AI, Jira, notifications)
+# РћСЃС‚Р°РІР»РµРЅС‹ РєР°Рє Р·Р°РіР»СѓС€РєРё РґР»СЏ СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё OpenAPI СЃС…РµРјС‹
+# в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+
+class DecisionDTO(BaseModel):
+    id: str | None = None
+    scenario_id: str
+    type: Literal["hire", "maintenance", "other"]
+    params: dict[str, float | int | str]
+    owner: str
+    due_date: date | None = None
+    expected_effect_byn: float = 0.0
+    notes: str | None = None
+    baseline_snapshot: dict[str, float] | None = None
+    actual_effect_byn: float = 0.0
+    verdict: Literal["effective", "ineffective", "pending"] = "pending"
+    created_at: datetime | None = None
+    jira_key: str | None = None
+
+
+class AiDTO(BaseModel):
+    scene: str
+    node_id: str
+    chain: list[str]
+    delta: dict[str, float]
+    cost_per_day: float
+    interpretation: str
+    source: Literal["cache", "deepseek", "fallback"]
+    cache_hit: bool
+
+
+class NotificationDTO(BaseModel):
+    id: str
+    channel: Literal["telegram", "email", "inapp"]
+    recipient: str
+    subject: str
+    body: str
+    status: Literal["sent", "failed", "skipped_no_token"]
+    created_at: datetime
+    related_decision_id: str | None = None
+

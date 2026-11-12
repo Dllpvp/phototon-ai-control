@@ -18,10 +18,11 @@ from pydantic import BaseModel, ConfigDict, Field
 # ──────────────────────────────────────────────────────────────────────
 
 class Norm(BaseModel):
-    """Норма метрики: нижняя/верхняя граница + единица измерения."""
+    """Норма метрики: нижняя/верхняя граница + единица измерения + мягкая граница (warn)."""
     lo: float | None = None
     hi: float | None = None
     unit: str
+    warn: float | None = None
 
 
 class GraphNode(BaseModel):
@@ -34,9 +35,9 @@ class GraphNode(BaseModel):
     domain: Literal["finance", "clients", "production", "hr", "quality", "season"]
     name: str
     unit: str
-    value: float
+    value: float | None
     norm: Norm | None = None
-    status: Literal["red", "yellow", "green"]
+    status: Literal["red", "yellow", "green", "hidden"]
     cost_per_day: float | None = None
     description: str | None = None
     literal: bool = False
@@ -96,7 +97,7 @@ class KpiDTO(BaseModel):
     name: str
     unit: str
     value: float
-    status: Literal["red", "yellow", "green"]
+    status: Literal["red", "yellow", "green", "hidden"]
     norm: Norm | None = None
     cost_per_day: float | None = None
 
@@ -166,6 +167,7 @@ class UnitEconDTO(BaseModel):
     labor: float
     defect: float
     margin_pct: float
+    status: Literal["red", "yellow", "green", "hidden"] = "green"
 
 
 class ChainNodeDTO(BaseModel):
@@ -173,9 +175,9 @@ class ChainNodeDTO(BaseModel):
     node_id: str
     name: str
     domain: str
-    value: float
+    value: float | None  # None для скрытых доменов
     unit: str
-    status: Literal["red", "yellow", "green"]
+    status: Literal["red", "yellow", "green", "hidden"]
     cost_per_day: float | None = None
     delta_from_parent: float | None = None  # изменение относительно родителя
 
@@ -241,6 +243,7 @@ class DecisionDTO(BaseModel):
     verdict: Literal["effective", "ineffective", "pending"] = "pending"
     created_at: datetime | None = None
     jira_key: str | None = None
+    notification: NotificationDTO | None = None
 
 
 class AiDTO(BaseModel):
@@ -263,3 +266,125 @@ class NotificationDTO(BaseModel):
     status: Literal["sent", "failed", "skipped_no_token"]
     created_at: datetime
     related_decision_id: str | None = None
+
+
+DecisionDTO.model_rebuild()
+
+# ──────────────────────────────────────────────────────────────────────
+# T18: Каталог KPI (PLAN-V2 §22.4, §22.10) — additive, v1 DTO не менять
+# ──────────────────────────────────────────────────────────────────────
+
+class MetricCatalogItemDTO(BaseModel):
+    """Карточка KPI из каталога 33 (T18).
+
+    value резолвится на запросе: node → граф, anchor → ANCHORS v1,
+    catalog → демо-значение лекции v2.2 (единственный источник — kpi_catalog.json).
+    formula_status="assumption" — формула не подтверждена заказчиком («допущение»).
+    """
+    id: str
+    name: str
+    department: str
+    unit: str
+    norm: Norm | None = None
+    value: float | None = None            # None: узел v2 ещё не смержен в граф
+    available: bool = True                # False → UI показывает «—»
+    value_kind: Literal["node", "anchor", "catalog"]
+    node_id: str | None = None
+    anchor_key: str | None = None
+    formula: str
+    formula_status: Literal["confirmed", "assumption"]
+    origin: Literal["v1", "v2", "lecture_v22"]
+    source_system: str
+
+
+class MetricCatalogDTO(BaseModel):
+    """Ответ GET /api/metrics/catalog?department= (T18)."""
+    total: int
+    department: str | None = None
+    items: list[MetricCatalogItemDTO]
+
+# ──────────────────────────────────────────────────────────────────────
+# T20: Migration Layer (PLAN-V2 §22.6, §22.10) — additive
+# ──────────────────────────────────────────────────────────────────────
+
+class MigrationSourceDTO(BaseModel):
+    """Источник данных для миграции. Реальный перенос — после доступов, сейчас контракт."""
+    system: str
+    name: str
+    department: str
+    objects: list[str]
+    access_mode: Literal["read_api", "export", "webhook", "manual_csv"]
+    pii_level: Literal["none", "personal", "commercial"]
+    migration_status: Literal["contract_ready", "emulator", "pending_access"]
+    notes: str | None = None
+
+
+class MigrationStepDTO(BaseModel):
+    """Шаг демо-миграции. mode=real — шаг делает настоящую работу, emulator — заглушка."""
+    n: int
+    key: str
+    title: str
+    status: Literal["completed", "failed", "skipped"]
+    detail: str
+    mode: Literal["real", "emulator"] = "emulator"
+
+
+class MigrationRunDTO(BaseModel):
+    """Ответ POST /api/migration/demo-run. Записывается в таблицу migration_runs."""
+    run_id: str
+    status: Literal["completed", "failed"]
+    mode: Literal["emulator"] = "emulator"
+    created_at: datetime
+    sources_count: int
+    pii_sources: int
+    steps: list[MigrationStepDTO]
+
+
+# ──────────────────────────────────────────────────────────────────────
+# T22: ИИ-монитор и инциденты — additive
+# ──────────────────────────────────────────────────────────────────────
+
+class IncidentDTO(BaseModel):
+    """Инцидент от монитора. Рекомендация — черновик, решение оформляет человек."""
+    id: str
+    cause_key: str
+    node_id: str
+    title: str
+    value: float
+    unit: str
+    root_cause: str
+    recommendation: str
+    status: Literal["open", "acknowledged", "resolved"]
+    resolution: Literal["accepted", "rejected"] | None = None
+    created_at: datetime
+    updated_at: datetime | None = None
+
+
+class MonitorCheckResultDTO(BaseModel):
+    """Ответ POST /api/monitor/check: сколько создано, сколько отклонено как дубли."""
+    created: int
+    duplicated: int
+    open_total: int
+    incidents: list[IncidentDTO]
+
+
+# ──────────────────────────────────────────────────────────────────────
+# T9d: Журнал аудита ИИ-вызовов (PLAN-V2 §6.5) — additive
+# ──────────────────────────────────────────────────────────────────────
+
+class AuditDTO(BaseModel):
+    """Запись журнала аудита ИИ-вызова (таблица ai_audit).
+
+    `payload_masked_json` — JSON уже замаскированного payload (сырого текста нет),
+    `payload_sha256` — sha256 сырого payload для сверки (хэш передаёт вызывающий).
+    """
+    id: int
+    ts: datetime
+    backend: str
+    mask_level: str
+    tokens_count: int
+    payload_masked_json: str
+    payload_sha256: str
+    verdict: str
+    reason: str | None = None
+

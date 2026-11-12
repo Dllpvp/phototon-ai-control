@@ -7,14 +7,15 @@ from __future__ import annotations
 
 from datetime import date, datetime
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
 from app.core.anchors import ANCHORS
 from app.core.loader import GraphNodePayload, GraphPayload, ScenarioNode, load_norms, load_scenario
 from app.dependencies import get_graph
 from app.schemas import AlertDTO, DashboardDTO, KpiDTO, Norm, SliceDescDTO
+from app.security.rbac import filter_dashboard, get_allowed_domains, get_dept, get_role
 
-router = APIRouter(prefix="/api", tags=["dashboard"])
+router = APIRouter(prefix="", tags=["dashboard"])
 
 
 def _build_norm(node: GraphNodePayload, norms: list) -> Norm | None:
@@ -108,14 +109,19 @@ def _build_alerts(
 async def get_dashboard(
     scenario: str = Query("main", description="ID сценария: main|neg|peak"),
     graph: GraphPayload = Depends(get_graph),
+    request: Request = None,
 ) -> DashboardDTO:
     """Дашборд: KPI сетка + алерты + loss counter."""
-    scenario_data = load_scenario(scenario)
+    try:
+        scenario_data = load_scenario(scenario)
+    except KeyError as e:
+        raise HTTPException(status_code=400, detail=f"Unknown scenario: {scenario}") from e
+
     norms = load_norms()
-    
+
     kpis = _build_kpis(scenario_data.nodes, graph, norms)
     alerts = _build_alerts(scenario_data.nodes, graph, norms, scenario_data.week)
-    
+
     # Headline: основная проблема
     red_alerts = [a for a in alerts if a.status == "red"]
     if red_alerts:
@@ -123,11 +129,11 @@ async def get_dashboard(
         headline = f"{main.title} {main.delta_text}, {main.cost_per_day:,.0f} BYN/сут".replace(",", " ")
     else:
         headline = "Все показатели в норме"
-    
+
     # loss_counter_started_at — дата as_of сценария в 00:00
     started_at = datetime.strptime(scenario_data.as_of, "%Y-%m-%d")
-    
-    return DashboardDTO(
+
+    dto = DashboardDTO(
         scenario_id=scenario_data.scenario_id,
         as_of=date.fromisoformat(scenario_data.as_of),
         week=scenario_data.week,
@@ -137,3 +143,7 @@ async def get_dashboard(
         headline=headline,
         updated_at=datetime.now(),
     )
+
+    # Демо-RBAC (T9b): фильтруем kpis/alerts по заголовку X-Demo-Role
+    allowed = get_allowed_domains(get_role(request), get_dept(request))
+    return filter_dashboard(dto, allowed)

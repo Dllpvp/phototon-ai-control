@@ -1,0 +1,52 @@
+[
+  {
+    "sku": "Фотокнига 20×20 стандарт",
+    "price": 92.0,
+    "paper": 21.0,
+    "printing": 12.0,
+    "binding": 18.0,
+    "labor": 15.0,
+    "defect": 2.0,
+    "margin_pct": 28.3
+  },
+  {
+    "sku": "Фотокнига 30×30 премиум",
+    "price": 210.0,
+    "paper": 48.0,
+    "printing": 22.0,
+    "binding": 34.0,
+    "labor": 28.0,
+    "defect": 4.0,
+    "margin_pct": 35.2
+  },
+  {
+    "sku": "B2B фотостудия «Луч»",
+    "price": 180.0,
+    "paper": 40.0,
+    "printing": 20.0,
+    "binding": 30.0,
+    "labor": 24.0,
+    "defect": 3.0,
+    "margin_pct": 35.6
+  },
+  {
+    "sku": "B2B маркетплейс «Книга»",
+    "price": 150.0,
+    "paper": 36.0,
+    "printing": 16.0,
+    "binding": 24.0,
+    "labor": 20.0,
+    "defect": 2.0,
+    "margin_pct": 34.7
+  },
+  {
+    "sku": "Клиент №7",
+    "price": 140.0,
+    "paper": 30.0,
+    "printing": 18.0,
+    "binding": 22.0,
+    "labor": 25.0,
+    "defect": 48.0,
+    "margin_pct": -1.9
+  }
+]

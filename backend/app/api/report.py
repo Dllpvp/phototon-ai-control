@@ -12,10 +12,10 @@ from fastapi.responses import StreamingResponse
 
 from app.report.pdf import generate_executive_summary
 
-router = APIRouter(prefix="/api", tags=["report"])
+router = APIRouter(prefix="/report", tags=["report"])
 
 
-@router.get("/report/executive.pdf", response_class=StreamingResponse)
+@router.get("/executive.pdf", response_class=StreamingResponse)
 async def get_executive_summary_pdf(
     scenario: str = Query("main", description="ID сценария: main|neg|peak"),
 ) -> StreamingResponse:

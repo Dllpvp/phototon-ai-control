@@ -1,0 +1,449 @@
+/* ===== FOTOPRINT SKIN LAYER ===== */
+/* Все стили только для [data-theme="fotoprint"] */
+/* Цвета ТОЛЬКО через токены var(--токен) */
+
+[data-theme="fotoprint"] {
+  /* Hero с жёлтым градиентом */
+  .hero-fotoprint {
+    background: var(--gradient-hero);
+    color: var(--text);
+    border-radius: var(--radius);
+    padding: 2rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-fotoprint::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .hero-fotoprint h1,
+  .hero-fotoprint h2 {
+    color: var(--text);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .hero-fotoprint p {
+    color: var(--muted);
+  }
+
+  /* Pill-навигация */
+  .pill-nav {
+    display: flex;
+    gap: 0.5rem;
+    background: var(--panel);
+    border: 1px solid var(--hair);
+    border-radius: 9999px;
+    padding: 0.375rem;
+  }
+
+  .pill-nav button {
+    padding: 0.5rem 1.25rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .pill-nav button:hover {
+    color: var(--text);
+    background: var(--panel-2);
+  }
+
+  .pill-nav button.active {
+    background: var(--accent);
+    color: var(--text);
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+  }
+
+  /* Glass-карточки */
+  .glass-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: all 0.3s ease;
+  }
+
+  .glass-card:hover {
+    background: var(--panel);
+    border-color: var(--hair-strong);
+    box-shadow: 0 8px 24px var(--shadow);
+  }
+
+  /* Жёлтая акцент-карточка (для CauseCarousel) */
+  .accent-card {
+    background: var(--gradient-yellow-accent);
+    border: 2px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    color: var(--text);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .accent-card::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .accent-card h3,
+  .accent-card h4 {
+    color: var(--text);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .accent-card .big-percent {
+    font-size: 3rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    color: var(--text);
+    line-height: 1;
+  }
+
+  /* Stat-сводка */
+  .stat-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+
+  .stat-card {
+    background: var(--panel);
+    border: 1px solid var(--hair);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    transition: all 0.2s ease;
+  }
+
+  .stat-card:hover {
+    border-color: var(--hair-strong);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow);
+  }
+
+  .stat-card .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    color: var(--text);
+    line-height: 1.2;
+  }
+
+  .stat-card .stat-label {
+    font-size: 0.875rem;
+    color: var(--muted);
+    margin-top: 0.25rem;
+  }
+
+  .stat-card.alert {
+    border-left: 4px solid var(--alert);
+  }
+
+  .stat-card.warn {
+    border-left: 4px solid var(--warn);
+  }
+
+  .stat-card.ok {
+    border-left: 4px solid var(--ok);
+  }
+
+  /* KPI-карточки */
+  .kpi-card {
+    background: var(--panel);
+    border: 1px solid var(--hair);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .kpi-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 8px 24px var(--shadow);
+    transform: translateY(-2px);
+  }
+
+  .kpi-card .kpi-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .kpi-card .kpi-unit {
+    font-size: 1rem;
+    color: var(--muted);
+    margin-left: 0.5rem;
+  }
+
+  .kpi-card .kpi-label {
+    font-size: 0.875rem;
+    color: var(--muted);
+    margin-top: 0.5rem;
+  }
+
+  /* Waterfall-диаграмма */
+  .waterfall {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.75rem;
+    height: 200px;
+    padding: 1rem 0;
+  }
+
+  .waterfall-bar {
+    flex: 1;
+    background: var(--panel-2);
+    border-radius: var(--radius);
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .waterfall-bar.positive {
+    background: var(--ok);
+  }
+
+  .waterfall-bar.negative {
+    background: var(--alert);
+  }
+
+  .waterfall-bar.neutral {
+    background: var(--accent);
+  }
+
+  .waterfall-bar .bar-label {
+    position: absolute;
+    bottom: -1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.75rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .waterfall-bar .bar-value {
+    position: absolute;
+    top: -1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text);
+    font-family: var(--font-mono);
+  }
+
+  /* Таблица показателей */
+  .indicators-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .indicators-table th {
+    background: var(--panel-2);
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid var(--hair-strong);
+  }
+
+  .indicators-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--hair);
+    color: var(--text);
+  }
+
+  .indicators-table tr {
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .indicators-table tr:hover {
+    background: var(--panel-2);
+  }
+
+  .indicators-table tr.expanded {
+    background: var(--panel-2);
+  }
+
+  /* Форма решений */
+  .decision-form {
+    background: var(--panel);
+    border: 1px solid var(--hair);
+    border-radius: var(--radius);
+    padding: 2rem;
+  }
+
+  .decision-form label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  .decision-form input,
+  .decision-form textarea,
+  .decision-form select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: var(--bg);
+    border: 1px solid var(--hair);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+  }
+
+  .decision-form input:focus,
+  .decision-form textarea:focus,
+  .decision-form select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--glass-bg);
+  }
+
+  .decision-form button {
+    background: var(--accent);
+    color: var(--text);
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: var(--radius);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .decision-form button:hover {
+    background: var(--accent-2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+  }
+
+  /* Журнал решений */
+  .journal-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .journal-table th {
+    background: var(--panel-2);
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid var(--hair-strong);
+  }
+
+  .journal-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--hair);
+    color: var(--text);
+  }
+
+  .journal-table tr {
+    transition: background 0.2s ease;
+  }
+
+  .journal-table tr:hover {
+    background: var(--panel-2);
+  }
+
+  /* Бейджи статусов */
+  .badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .badge-alert {
+    background: var(--alert-soft);
+    color: var(--alert);
+  }
+
+  .badge-warn {
+    background: var(--warn-soft);
+    color: var(--warn);
+  }
+
+  .badge-ok {
+    background: var(--ok-soft);
+    color: var(--ok);
+  }
+
+  .badge-accent {
+    background: var(--glass-bg);
+    color: var(--accent);
+    border: 1px solid var(--glass-border);
+  }
+
+  /* Адаптивность для FullHD */
+  @media (min-width: 1920px) {
+    .hero-fotoprint {
+      padding: 3rem 4rem;
+    }
+
+    .hero-fotoprint h1 {
+      font-size: 3rem;
+    }
+
+    .stat-summary {
+      gap: 1.5rem;
+    }
+
+    .stat-card .stat-value {
+      font-size: 2.5rem;
+    }
+
+    .kpi-card .kpi-value {
+      font-size: 3rem;
+    }
+  }
+
+  /* Уважение к prefers-reduced-motion */
+  @media (prefers-reduced-motion: reduce) {
+    .glass-card,
+    .kpi-card,
+    .stat-card,
+    .pill-nav button,
+    .decision-form button {
+      transition: none;
+    }
+
+    .glass-card:hover,
+    .kpi-card:hover,
+    .stat-card:hover {
+      transform: none;
+    }
+  }
+}

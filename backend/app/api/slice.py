@@ -13,7 +13,7 @@ from fastapi import APIRouter, Depends, Query
 from app.core.loader import FactRecord, FactsPayload, load_facts
 from app.schemas import SliceDTO, SliceFactDTO
 
-router = APIRouter(prefix="/api", tags=["slice"])
+router = APIRouter(tags=["slice"])
 
 
 @router.get("/slice", response_model=SliceDTO)
@@ -51,7 +51,7 @@ async def get_slice(
     filtered_facts.sort(key=lambda f: f.ts)
     
     return SliceDTO(
-        from_=from_,
+        **{"from": from_},
         to=to,
         line=line,
         shift=shift,

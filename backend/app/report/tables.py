@@ -79,7 +79,7 @@ def _decisions_table(ctx, styles) -> Table:
         ])
     
     if len(data) == 1:
-        data.append([Paragraph("Решений нет", styles["table_cell"], 0, 0, 0, 0)] + [Paragraph("—", styles["table_cell"])] * 6)
+        data.append([Paragraph("Решений нет", styles["table_cell"])] + [Paragraph("—", styles["table_cell"])] * 6)
     
     col_widths = [1.8*cm, 2.5*cm, 2*cm, 2*cm, 1.8*cm, 2*cm, 2.5*cm]
     table = Table(data, colWidths=col_widths, repeatRows=1)

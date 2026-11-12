@@ -1,28 +1,22 @@
 ﻿from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import ai, chain, dashboard, decisions, forecast, graph, report, slice, unit_econ, whatif
+from app.api import router as api_router
 
 app = FastAPI(title="FotoPrint Control API")
 
+# Строгое CORS для localhost:5174 (фронтенд Vite dev server)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:5174"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-app.include_router(ai.router)
-app.include_router(chain.router)
-app.include_router(dashboard.router)
-app.include_router(decisions.router)
-app.include_router(forecast.router)
-app.include_router(graph.router)
-app.include_router(report.router)
-app.include_router(slice.router)
-app.include_router(unit_econ.router)
-app.include_router(whatif.router)
+# Подключаем централизованный роутер из app.api
+app.include_router(api_router)
+
 
 @app.get("/api/health")
 def health_check():
