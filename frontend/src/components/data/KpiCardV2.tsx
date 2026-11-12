@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { containerTransform, fadeIn, useMotionReduced } from "../../lib/motion";
-import type { KpiData } from "../../lib/adapters";
+import { KpiData } from "../../lib/adapters";
 
 type KpiCardV2Props = {
   kpi: KpiData;

@@ -1,0 +1,23 @@
+{
+  "department": "production",
+  "display_name": "Производство",
+  "sources": [
+    {"id": "erp", "name": "ERP (1С)", "pii_level": "medium"},
+    {"id": "mes", "name": "MES (цех)", "pii_level": "low"},
+    {"id": "hr", "name": "HR‑система", "pii_level": "high"},
+    {"id": "otk", "name": "ОТК", "pii_level": "low"}
+  ],
+  "metrics": [
+    {"id": "downtime", "name": "Простой линии", "unit": "ч/сут", "domain": "production"},
+    {"id": "defect", "name": "Процент брака", "unit": "%", "domain": "quality"},
+    {"id": "cycle", "name": "Цикл производства", "unit": "ч", "domain": "production"},
+    {"id": "press_hold", "name": "Выдержка пресса", "unit": "сек", "domain": "production"},
+    {"id": "reprints", "name": "Повторные тиражи", "unit": "тираж/сут", "domain": "production"}
+  ],
+  "roles": [
+    {"id": "production_head", "name": "Начальник производства"},
+    {"id": "shift_master", "name": "Мастер смены"},
+    {"id": "operator", "name": "Оператор"}
+  ],
+  "typical_deviations": []
+}

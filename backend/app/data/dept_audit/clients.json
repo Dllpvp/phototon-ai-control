@@ -1,0 +1,20 @@
+{
+  "department": "clients",
+  "display_name": "Клиентский сервис",
+  "sources": [
+    {"id": "mary", "name": "Мэри (CRM)", "pii_level": "high"},
+    {"id": "telegram", "name": "Telegram‑бот", "pii_level": "medium"},
+    {"id": "erp", "name": "ERP (1С)", "pii_level": "medium"}
+  ],
+  "metrics": [
+    {"id": "tickets", "name": "Тикеты", "unit": "шт/день", "domain": "clients"},
+    {"id": "frt", "name": "Время первого ответа", "unit": "мин", "domain": "clients"},
+    {"id": "answer_1min", "name": "Ответ за 1 минуту", "unit": "%", "domain": "clients"},
+    {"id": "bot_share", "name": "Доля закрытых ботом", "unit": "%", "domain": "clients"}
+  ],
+  "roles": [
+    {"id": "support_head", "name": "Руководитель поддержки"},
+    {"id": "manager", "name": "Менеджер"}
+  ],
+  "typical_deviations": []
+}
