@@ -15,6 +15,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
+from app.config import settings
 from app.schemas import AuditDTO
 
 # Путь к БД (тот же, что decisions) — env или backend/state.db
@@ -47,13 +48,21 @@ def _get_conn() -> sqlite3.Connection:
     return conn
 
 
+def _default_mask_level() -> str:
+    """Возвращает mask_level из settings (MASK_LEVEL, T9e) или 'strict' как фолбэк."""
+    try:
+        return settings.mask_level
+    except AttributeError:
+        return "strict"
+
+
 def log_call(
     backend: str,
-    mask_level: str,
-    tokens_count: int,
-    payload_masked_json: str,
-    payload_sha256: str,
-    verdict: str,
+    mask_level: Optional[str] = None,
+    tokens_count: int = 0,
+    payload_masked_json: str = "",
+    payload_sha256: str = "",
+    verdict: str = "allow",
     reason: Optional[str] = None,
 ) -> int:
     """
@@ -71,6 +80,7 @@ def log_call(
     Функция НЕ логирует сырой текст в stdout/stderr.
     """
     ts = datetime.now(timezone.utc).isoformat()
+    level = mask_level if mask_level is not None else _default_mask_level()
 
     with _get_conn() as conn:
         cur = conn.execute(
@@ -79,7 +89,7 @@ def log_call(
                                   payload_masked_json, payload_sha256, verdict, reason)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
-            (ts, backend, mask_level, tokens_count, payload_masked_json, payload_sha256, verdict, reason),
+            (ts, backend, level, tokens_count, payload_masked_json, payload_sha256, verdict, reason),
         )
         conn.commit()
         return cur.lastrowid
